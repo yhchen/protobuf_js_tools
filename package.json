@@ -1,0 +1,26 @@
+{
+  "name": "protobuf_js_tools",
+  "version": "1.0.0",
+  "description": "build *.proto files to static js and ts files",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fs-extra-promise": "^1.0.1",
+    "chalk": "^2.4.1",
+    "uglify-js": "^3.3.27"
+  },
+  "devDependencies": {
+    "@types/node": "^8.10.17",
+    "@types/chalk": "^2.2.0",
+    "@types/fs-extra-promise": "^1.0.5",
+    "typescript": "^2.8.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yhchen/protobuf_js_tools"
+  }
+}
