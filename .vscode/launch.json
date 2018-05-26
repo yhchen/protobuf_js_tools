@@ -8,11 +8,11 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/bin/build_proto_files.js",
+            "program": "${workspaceRoot}/bin/build_proto_files.js",
             "outFiles": [
-                "${workspaceFolder}/**/*.js"
+                "${workspaceRoot}/**/*.js"
             ],
-            "console": "internalConsole"
+            "console": "externalTerminal"
         }
     ]
 }

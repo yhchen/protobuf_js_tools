@@ -4,8 +4,6 @@ import * as fs from 'fs-extra-promise';
 import * as UglifyJS from 'uglify-js';
 import * as os from 'os';
 import * as chalk from 'chalk';
-import { outputFile } from 'fs-extra-promise';
-import { TIMEOUT } from 'dns';
 import { isString, isBoolean } from 'util';
 
 const green = chalk.default.greenBright;
@@ -22,13 +20,13 @@ function shell(command: string, args: string[]) {
         const cmd = command + ' ' + args.join(' ');
         child_process.exec(cmd, (error, stdout, stderr) => {
             if (error) {
-                reject(error);
+                reject(error + stderr);
             }
             else {
                 resolve(stdout)
             }
-        })
-    })
+        });
+    });
 }
 
 
@@ -106,7 +104,7 @@ async function generate(_rootDir: string) {
             if (g_pbConfig.options[_key]) {
                 args.unshift(_key);
             }
-        } else {
+        } else if (isString(g_pbConfig.options[_key])) {
             args.unshift(g_pbConfig.options[_key]);
             args.unshift(_key);
         }
@@ -115,7 +113,7 @@ async function generate(_rootDir: string) {
     let pbjsResult = await fs.readFileAsync(tempfile, 'utf-8');
     pbjsResult = 'var $protobuf = window.protobuf;\n$protobuf.roots.default=window;\n' + pbjsResult;
     logger(`gen js file :${green(jsOutFile)}`);
-    logger(`file size   :${yellow(format_size(pbjsResult.length))}`)
+    logger(`file size   :${yellow(format_size(pbjsResult.length))}`);
     await fs.writeFileAsync(jsOutFile, pbjsResult, 'utf-8');
     // gen min js
     const minjs = UglifyJS.minify(pbjsResult);
@@ -229,12 +227,16 @@ async function generate(_rootDir: string) {
         }\n\
     }\n";
         const sproto_file_content = sproto_import_content + `namespace ProtoDef\n{\n` + sproto_map + sproto_handler_map + sproto_type_handler_map + sproto_funtional_body + "}\n";
-        await fs.writeFileAsync(path.join(_rootDir, g_pbConfig.outputTSCodeFile), sproto_file_content, {encoding:'utf-8', flag:'w+'});
+        const tsCodeFilePath = path.join(_rootDir, g_pbConfig.outputTSCodeFile);
+        await fs.mkdirpAsync(path.dirname(tsCodeFilePath));
+        await fs.writeFileAsync(tsCodeFilePath, sproto_file_content, {encoding:'utf-8', flag:'w+'});
+        logger(`gen ts file :${green(tsCodeFilePath)}`);
+        logger(`file size   :${yellow(format_size(sproto_file_content.length))}`);
     }
 
-    logger(`***********************************************`);
-    logger(`*              done with all                  *`);
-    logger(`***********************************************`);
+    logger(chalk.default.whiteBright(`***********************************************`));
+    logger(chalk.default.whiteBright(`*              done with all                  *`));
+    logger(chalk.default.whiteBright(`***********************************************`));
 }
 
 type PackageDef = {
@@ -292,7 +294,7 @@ async function generate_tables(protoRoot: string, protoFileList: string[]) {
         }
     }
 
-    console.log(yellow(JSON.stringify(package_def)));
+    // logger(yellow(JSON.stringify(package_def)));
     return package_def;
 }
 

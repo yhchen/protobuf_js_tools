@@ -15,8 +15,8 @@ CALL npm install
 popd
 
 echo ======================================================
-echo = install uglify fs-extra eslint tslint
-CALL npm install -g uglify fs-extra-promise fs-extra eslint tslint
+echo = install uglify fs-extra eslint tslint typescript
+CALL npm install -g uglify fs-extra-promise fs-extra eslint tslint typescript
 echo = install protobuf.js
 CALL npm install -g protobufjs
 echo = init pbjs first run
