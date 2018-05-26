@@ -14,10 +14,11 @@
     "uglify-js": "^3.3.27"
   },
   "devDependencies": {
+    "typescript": "^2.8.3",
     "@types/node": "^8.10.17",
-    "@types/chalk": "^2.2.0",
     "@types/fs-extra-promise": "^1.0.5",
-    "typescript": "^2.8.3"
+    "@types/chalk": "^2.2.0",
+    "@types/uglify-js": "^3.0.2"
   },
   "repository": {
     "type": "git",
