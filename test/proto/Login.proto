@@ -1,0 +1,15 @@
+package Login; //$1
+
+message LoginReq //$1
+{
+	required string account = 1;
+	required string token = 2;
+	required  string version = 3;
+	optional string platform = 4 ;
+
+}
+
+message LoginRsp //$2
+{
+	required int32 code = 1;
+}

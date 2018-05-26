@@ -1,0 +1,12 @@
+package Player; //$2
+
+message Info //$1
+{
+    required int32 uid = 1;
+    required string name = 2;
+}
+
+message Test //$2
+{
+    required int32 avator = 1;
+}

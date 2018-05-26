@@ -1,0 +1,19 @@
+{
+    "options": {
+        "-t": "static",
+        "--keep-case": false,
+        "--no-create": true,
+        "--no-encode": false,
+        "--no-decode": false,
+        "--no-verify": true,
+        "--no-convert": true,
+        "--no-delimited": true,
+        "--no-beautify": false,
+        "--no-comments": false
+    },
+    "importProtoBuffPath": "../../includes/protobuf",
+    "sourceRoot": "./test/proto/",
+    "outputFile": "./test/static-code/protobuf-static.js",
+    "outputTSFile": "./test/static-code/protobuf-static.d.ts",
+    "outputTSCodeFile": "./test/static-code/proto_def.ts"
+}
