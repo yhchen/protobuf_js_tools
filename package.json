@@ -1,12 +1,12 @@
 {
   "name": "protobuf_js_tools",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "build *.proto files to static js and ts files",
-  "main": "index.js",
+  "main": "./bin/build_proto_files.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "yhchen",
   "license": "ISC",
   "dependencies": {
     "fs-extra-promise": "^1.0.1",
