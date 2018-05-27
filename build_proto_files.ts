@@ -145,7 +145,7 @@ async function generate(_rootDir: string) {
         let sproto_map = '\t//Proto Msg Check\n\texport type IMsgMap = {\n';
         let sproto_handler_map = '\t//Proto Msg Handler\n\texport const SCHandlerMap = {\n';
         let sproto_type_handler_map = 
-        '\tinterface IHandler<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]> {\n' +
+        '\texport interface IHandler<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]> {\n' +
         '\t\ts: T;//         sysid(string)\n' +
         '\t\tc: T1;//        cmdid(string)\n' +
         '\t\tns: number,//   sysid(number)\n' +
