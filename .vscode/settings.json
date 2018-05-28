@@ -1,0 +1,9 @@
+{
+    "editor.detectIndentation": true,
+    "editor.insertSpaces": false,
+    "editor.renderWhitespace": "all",
+    "editor.tabSize": 4,
+    "editor.trimAutoWhitespace": true,
+    "editor.useTabStops": true,
+    "files.trimTrailingWhitespace": true
+}
