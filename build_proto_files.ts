@@ -127,9 +127,10 @@ async function generate(_rootDir: string) {
 	let pbtsResult = await fs.readFileAsync(tempfile, 'utf-8');
 	pbtsResult = pbtsResult.replace(/\$protobuf/gi, 'protobuf').replace(/export namespace/gi, 'declare namespace');
 	pbtsResult = 'type Long = protobuf.Long;\n' + pbtsResult;
-	let tsOutFile = g_pbConfig.outputTSFile == null ? g_pbConfig.outputTSFile : jsOutFile.substr(0, jsOutFile.lastIndexOf('.js')) + '.d.ts';
+	let tsOutFile = g_pbConfig.outputTSFile ? path.join(_rootDir, g_pbConfig.outputTSFile) : jsOutFile.substr(0, jsOutFile.lastIndexOf('.js')) + '.d.ts';
 	logger(`gen ts file :${green(tsOutFile)}`);
 	logger(`file size   :${yellow(format_size(pbtsResult.length))}`);
+	await fs.mkdirpAsync(path.dirname(tsOutFile));
 	await fs.writeFileAsync(tsOutFile, pbtsResult, 'utf-8');
 	await fs.removeAsync(tempfile);
 	// gen encode decode and type check code & save file
@@ -245,7 +246,7 @@ async function generate(_rootDir: string) {
 	}
 
 	logger(whiteBright(`***********************************************`));
-	logger(whiteBright(`*			  done with all				  *`));
+	logger(whiteBright(`*               done with all                 *`));
 	logger(whiteBright(`***********************************************`));
 }
 

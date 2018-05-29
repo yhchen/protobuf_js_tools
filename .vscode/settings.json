@@ -5,5 +5,11 @@
     "editor.tabSize": 4,
     "editor.trimAutoWhitespace": true,
     "editor.useTabStops": true,
-    "files.trimTrailingWhitespace": true
+    "files.trimTrailingWhitespace": true,
+    "typescript.autoImportSuggestions.enabled": true,
+    "typescript.check.npmIsInstalled": true,
+    "typescript.format.enable": true,
+    "typescript.format.insertSpaceAfterConstructor": true,
+    "typescript.format.insertSpaceAfterCommaDelimiter": true,
+    "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true
 }
