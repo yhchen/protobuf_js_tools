@@ -173,7 +173,7 @@ async function generate(_rootDir: string) {
 	if (protoList.length == 0) {
 		exception(`${protoRoot} *.proto not found!`);
 	}
-	logger(`found .proto:${green(fileList.toString())}`);
+	logger(`found .proto:${green(protoList.toString())}`);
 
 	if (gCfg.defOptions.packageCmdMode) {
 			await Promise.all(protoList.map(async (protofile) => {
@@ -324,8 +324,10 @@ async function generate_NormalMode_tables(protoRoot: string, protoFileList: stri
 		let lines = fcontent.split('\n');
 		// find package first
 		let package_name = '__None_NameSpace__';
-		while (lines.length > 0) {
-			let line = lines.shift().trim();
+		let found_package = false;
+		let index = 0;
+		for (; index < lines.length; ++index) {
+			let line = lines[index].trim();
 			// not package line
 			if (line.substr(0, package_line.length) != package_line) {
 				continue;
@@ -336,12 +338,17 @@ async function generate_NormalMode_tables(protoRoot: string, protoFileList: stri
 				exception(`package name:${yellow(package_name)} redefined `);
 			}
 			package_def[package_name] = { message_list:[] };
+			found_package = true;
 			break;
 		}
 
+		if (!found_package) {
+			index = 0;
+		}
+
 		// find message
-		while (lines.length > 0) {
-			let line = lines.shift().trim();
+		for (; index < lines.length; ++index) {
+			let line = lines[index].trim();
 			// not message line
 			if (line.substr(0, message_line.length) != message_line) {
 				continue;
@@ -361,12 +368,12 @@ async function gen_NormalMode_content(protoRoot: string, protoFileList: string[]
 
 	for (let pname in package_def) {
 		for (let cname of package_def[pname].message_list) {
-			if (cname != '__None_NameSpace__') {
-				sproto_INotifyType += `\t\t		'${pname}_${cname}': ${pname}.I${cname},\n`;
-				sproto_NotifyType += `\t\t		${pname}_${cname}: '${pname}_${cname}',\n`;
+			if (pname != '__None_NameSpace__') {
+				sproto_INotifyType += `\t\t'${pname}_${cname}': ${pname}.I${cname},\n`;
+				sproto_NotifyType += `\t\t${pname}_${cname}: '${pname}_${cname}',\n`;
 			} else {
-				sproto_INotifyType += `\t\t		'${cname}': I${cname},\n`;
-				sproto_NotifyType += `\t\t		${cname}: '${cname}',\n`;
+				sproto_INotifyType += `\t\t'${cname}': I${cname},\n`;
+				sproto_NotifyType += `\t\t${cname}: '${cname}',\n`;
 			}
 		}
 	}
