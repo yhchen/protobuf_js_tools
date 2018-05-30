@@ -18,7 +18,7 @@ type _DefKeyEnum<T> = {
 	[P in keyof T]: P
 };
 
-export const NotifyType: _DeepReadonly<_DefKeyEnum<INotifyType>> = {
+{5}const NotifyType: _DeepReadonly<_DefKeyEnum<INotifyType>> = {
 {4}
 }
 

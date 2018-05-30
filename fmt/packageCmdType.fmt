@@ -10,7 +10,7 @@ type _DeepReadonly<T> = {
 };
 
 //Proto Msg Check
-export type IMsgMap = {
+{7}type IMsgMap = {
 {3}
 };
 
@@ -18,9 +18,9 @@ export type IMsgMap = {
 const _SCHandlerMap = {
 {4}
 };
-export const SCHandlerMap = _SCHandlerMap as _DeepReadonly<typeof _SCHandlerMap>;
+{7}const SCHandlerMap = _SCHandlerMap as _DeepReadonly<typeof _SCHandlerMap>;
 
-export interface IHandler<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]> {
+{7}interface IHandler<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]> {
 	readonly s: T;//		package_id(string)
 	readonly c: T1;//		message_id(string)
 	readonly ns?: number,//	package_id(number)
@@ -30,9 +30,9 @@ export interface IHandler<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]> 
 const _HandlerMap = {
 {5}
 };
-export const HandlerMap = _HandlerMap as _DeepReadonly<typeof _HandlerMap>;
+{7}const HandlerMap = _HandlerMap as _DeepReadonly<typeof _HandlerMap>;
 
-export function EncodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, proto: IMsgMap[T][T1]) : Uint8Array|undefined {
+{7}function EncodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, proto: IMsgMap[T][T1]) : Uint8Array|undefined {
 	try {
 		let buffer: protobuf.Writer = _handler.pt.encode(proto);
 		return buffer.finish();
@@ -41,7 +41,7 @@ export function EncodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_h
 	}
 }
 
-export function DecodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, buffer: Uint8Array) : IMsgMap[T][T1] {
+{7}function DecodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, buffer: Uint8Array) : IMsgMap[T][T1] {
 	try {
 		return _handler.pt.decode(buffer);
 	} catch (ex) {
@@ -50,7 +50,7 @@ export function DecodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_h
 }
 
 
-export function EncodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(package_id: T, message_id: T1, proto: IMsgMap[T][T1]) : Uint8Array|undefined {
+{7}function EncodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(package_id: T, message_id: T1, proto: IMsgMap[T][T1]) : Uint8Array|undefined {
 	const package_handler = SCHandlerMap[package_id];
 	if (package_handler == null) {
 		console.error(`Encode Proto failure. package type package_id:[${package_id}] message_id:${message_id}] not found.`);
@@ -69,7 +69,7 @@ export function EncodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(p
 	}
 }
 
-export function DecodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(package_id: T, message_id: T1, buffer: Uint8Array) : IMsgMap[T][T1] {
+{7}function DecodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(package_id: T, message_id: T1, buffer: Uint8Array) : IMsgMap[T][T1] {
 	const package_handler = SCHandlerMap[package_id];
 	if (package_handler == null) {
 		console.error(`Decode Proto failure. package type package_id:[${package_id}] message_id:${message_id}] not found.`);

@@ -380,15 +380,16 @@ async function gen_NormalMode_content(protoRoot: string, protoFileList: string[]
 
 	const sproto_export = gCfg.defOptions.nodejsMode ? "export " : "";
 	const sproto_import_content = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.importPath)
-						? `import * as protobuf from '${gCfg.defOptions.importPath}';\n`
-						: "";
+	? `import * as protobuf from '${gCfg.defOptions.importPath}';\n`
+	: "";
 	const sproto_reference_content = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.referencePath)
-						? `/// <reference path="${gCfg.defOptions.referencePath}" />\n`
-						: "";
+	? `/// <reference path="${gCfg.defOptions.referencePath}" />\n`
+	: "";
 	const sproto_namespace_head = !NullStr(gCfg.defOptions.rootNamespace)
-						? `${sproto_export}namespace ${gCfg.defOptions.rootNamespace} {\n`
-						: "";
+	? `${sproto_export}namespace ${gCfg.defOptions.rootNamespace} {\n`
+	: "";
 	const sproto_namespace_tail = !NullStr(gCfg.defOptions.rootNamespace) ? "}\n" : "";
+	const sproto_export_namespace = !NullStr(gCfg.defOptions.rootNamespace) ? "export " : "";
 
 	const sproto_file_content = String.format(sproto_def_fmt,
 		sproto_import_content,
@@ -397,6 +398,7 @@ async function gen_NormalMode_content(protoRoot: string, protoFileList: string[]
 		sproto_INotifyType,
 		sproto_NotifyType,
 		sproto_namespace_tail,
+		sproto_export_namespace,
 	);
 	return sproto_file_content;
 }
@@ -440,6 +442,7 @@ async function gen_packageCmdMode_content(protoRoot: string, protoFileList: stri
 						? `${sproto_export}namespace ${gCfg.defOptions.rootNamespace} {\n`
 						: "";
 	const sproto_namespace_tail = !NullStr(gCfg.defOptions.rootNamespace) ? "}\n" : "";
+	const sproto_export_namespace = !NullStr(gCfg.defOptions.rootNamespace) || gCfg.defOptions.nodejsMode ? "export " : "";
 
 	const sproto_file_content = String.format(sproto_def_fmt,
 		sproto_import_content,
@@ -449,6 +452,7 @@ async function gen_packageCmdMode_content(protoRoot: string, protoFileList: stri
 		sproto_SCHandlerMap,
 		sproto_HandlerMap,
 		sproto_namespace_tail,
+		sproto_export_namespace
 	);
 	return sproto_file_content;
 }
