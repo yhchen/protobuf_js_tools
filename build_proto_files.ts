@@ -174,12 +174,15 @@ async function generate(_rootDir: string) {
 		exception(`${protoRoot} *.proto not found!`);
 	}
 	logger(`found .proto:${green(fileList.toString())}`);
-	await Promise.all(protoList.map(async (protofile) => {
-		const content = await fs.readFileAsync(path.join(protoRoot, protofile), 'utf-8')
-		if (content.indexOf('package') == -1) {
-			exception(`${protofile} must have "package XXX;" declare!`);
-		}
-	}));
+
+	if (gCfg.defOptions.packageCmdMode) {
+			await Promise.all(protoList.map(async (protofile) => {
+				const content = await fs.readFileAsync(path.join(protoRoot, protofile), 'utf-8')
+				if (content.indexOf('package') == -1) {
+					exception(`${protofile} must have "package XXX;" declare!`);
+				}
+			}));
+	}
 
 	const args = ['-p', protoRoot, protoList.join(' '), '-o', tempfile];
 	for (let _key in gCfg.options) {
