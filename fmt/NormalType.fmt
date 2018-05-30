@@ -1,32 +1,34 @@
 {0}{1}
-namespace {2}
-{
-	/**
-	 * 递归将 “T” 中及其子对象所有属性设置为只读
-	 * Make all properties recursive in T readonly
-	 */
-	type _DeepReadonly<T> = {
-		readonly [P in keyof T]: _DeepReadonly<T[P]>;
-	};
+{2}
 
-	// notify type
-	type INotifyType = _DeepReadonly<{
+/**
+ * 递归将 “T” 中及其子对象所有属性设置为只读
+ * Make all properties recursive in T readonly
+ */
+type _DeepReadonly<T> = {
+	readonly [P in keyof T]: _DeepReadonly<T[P]>;
+};
+
+// notify type
+type INotifyType = _DeepReadonly<{
 {3}
-	}>;
+}>;
 
-	type _DefKeyEnum<T> = {
-		[P in keyof T]: P
-	};
+type _DefKeyEnum<T> = {
+	[P in keyof T]: P
+};
 
-	export const NotifyType: _DeepReadonly<_DefKeyEnum<INotifyType>> = {
+export const NotifyType: _DeepReadonly<_DefKeyEnum<INotifyType>> = {
 {4}
-	}
-
-	function _DeclareDefKeyName<T>(): _DefKeyEnum<T> {
-		const result: _DefKeyEnum<T>|any = {};
-		return result;
-	}
-
-	function RegNotify<T extends keyof typeof NotifyType>(eventType: T, listener:(data: _DeepReadonly<INotifyType[T]>)=>void): void {
-	}
 }
+
+function _DeclareDefKeyName<T>(): _DefKeyEnum<T> {
+	const result: _DefKeyEnum<T>|any = {};
+	return result;
+}
+
+function RegNotify<T extends keyof typeof NotifyType>(eventType: T, listener:(data: _DeepReadonly<INotifyType[T]>)=>void): void {
+}
+
+{3}
+

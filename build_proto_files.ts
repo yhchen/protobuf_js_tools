@@ -378,15 +378,25 @@ async function gen_NormalMode_content(protoRoot: string, protoFileList: string[]
 		}
 	}
 
-	const sproto_import_content = !NullStr(gCfg.defOptions.importPath) ? `import * as protobuf from '${gCfg.defOptions.importPath}';\n` : "";
-	const sproto_reference_content = !NullStr(gCfg.defOptions.referencePath) ? `/// <reference path="${gCfg.defOptions.referencePath}" />\n` : "";
+	const sproto_export = gCfg.defOptions.nodejsMode ? "export " : "";
+	const sproto_import_content = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.importPath)
+						? `import * as protobuf from '${gCfg.defOptions.importPath}';\n`
+						: "";
+	const sproto_reference_content = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.referencePath)
+						? `/// <reference path="${gCfg.defOptions.referencePath}" />\n`
+						: "";
+	const sproto_namespace_head = !NullStr(gCfg.defOptions.rootNamespace)
+						? `${sproto_export}namespace ${gCfg.defOptions.rootNamespace} {\n`
+						: "";
+	const sproto_namespace_tail = !NullStr(gCfg.defOptions.rootNamespace) ? "}\n" : "";
 
 	const sproto_file_content = String.format(sproto_def_fmt,
 		sproto_import_content,
 		sproto_reference_content,
-		gCfg.defOptions.rootNamespace,
+		sproto_namespace_head,
 		sproto_INotifyType,
 		sproto_NotifyType,
+		sproto_namespace_tail,
 	);
 	return sproto_file_content;
 }
@@ -419,16 +429,26 @@ async function gen_packageCmdMode_content(protoRoot: string, protoFileList: stri
 		sproto_HandlerMap += '\t\t},\n';
 	}
 
-	const sproto_import_content = !NullStr(gCfg.defOptions.importPath) ? `import * as protobuf from '${gCfg.defOptions.importPath}';\n` : "";
-	const sproto_reference_content = !NullStr(gCfg.defOptions.referencePath) ? `/// <reference path="${gCfg.defOptions.referencePath}" />\n` : "";
+	const sproto_export = gCfg.defOptions.nodejsMode ? "export " : "";
+	const sproto_import_content = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.importPath)
+						? `import * as protobuf from '${gCfg.defOptions.importPath}';\n`
+						: "";
+	const sproto_reference_content = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.referencePath)
+						? `/// <reference path="${gCfg.defOptions.referencePath}" />\n`
+						: "";
+	const sproto_namespace_head = !NullStr(gCfg.defOptions.rootNamespace)
+						? `${sproto_export}namespace ${gCfg.defOptions.rootNamespace} {\n`
+						: "";
+	const sproto_namespace_tail = !NullStr(gCfg.defOptions.rootNamespace) ? "}\n" : "";
 
 	const sproto_file_content = String.format(sproto_def_fmt,
 		sproto_import_content,
 		sproto_reference_content,
-		gCfg.defOptions.rootNamespace,
+		sproto_namespace_head,
 		sproto_IMsgMap,
 		sproto_SCHandlerMap,
-		sproto_HandlerMap
+		sproto_HandlerMap,
+		sproto_namespace_tail,
 	);
 	return sproto_file_content;
 }

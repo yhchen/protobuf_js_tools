@@ -34,8 +34,8 @@
         "packageCmdMode": true,
         "rootNamespace": "ProtoDef",                    "-c02": "root namespace for export file",
         "nodejsMode": true,                             "-c03": "nodejs mode for `export`",
-        "importPath": "../../includes/protobuf",        "-c04": "import protobuf file(for nodejs)",
-		"referencePath": "./protobuf-static.d.ts",      "-c05": "/// <reference path=\"<You Path Here>\" />",
+        "importPath": "../../includes/protobuf",        "-c04": "import protobuf file(only available for nodejsMode=true)",
+		"referencePath": "./protobuf-static.d.ts",      "-c05": "/// <reference path=\"<You Path Here>\" />(only available for nodejsMode=true)",
         "outTSFile": "./test/static-code/proto_def.ts"
     },
     "sourceRoot": "./test/proto/",
