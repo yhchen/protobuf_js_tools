@@ -34,7 +34,13 @@ function NullStr(s: string): boolean {
 const green = chalk.default.greenBright;
 const yellow = chalk.default.yellowBright.underline;
 const whiteBright = chalk.default.whiteBright;
+const redBright = chalk.default.redBright;
 const logger = console.log;
+function exception(fmt:string, ...args:any[]): void {
+	const message = String.format(fmt, ...args);
+	logger(redBright(message));
+	throw `${message}`;
+}
 
 
 logger(`__dirname   :${green(__dirname)}`);
@@ -112,7 +118,7 @@ const fmt_file_list = {
 // load config file
 {
 	if (!fs.existsSync(config_file_path)) {
-		throw `build config file ${config_file_path} not found`;
+		exception(`build config file ${config_file_path} not found`);
 	}
 	const config_content = fs.readFileSync(config_file_path, 'utf-8');
 	var gCfg: ProtobufConfig = JSON.parse(config_content);
@@ -124,7 +130,7 @@ const fmt_file_list = {
 {
 	let fmt_file_path: string = fmt_file_list[`${gCfg.defOptions.packageCmdMode}`];
 	if (!fs.existsSync(fmt_file_path)) {
-		throw `fmt file ${fmt_file_path} not found`;
+		exception(`fmt file ${fmt_file_path} not found`);
 	}
 	var sproto_def_fmt = fs.readFileSync(fmt_file_path, 'utf-8');
 	logger(whiteBright(`load fmt file success!`));
@@ -152,13 +158,13 @@ async function generate(_rootDir: string) {
 	const fileList = await fs.readdirAsync(protoRoot);
 	const protoList = fileList.filter(item => path.extname(item) === '.proto')
 	if (protoList.length == 0) {
-		throw `${protoRoot} *.proto not found!`;
+		exception(`${protoRoot} *.proto not found!`);
 	}
 	logger(`found .proto:${green(fileList.toString())}`);
 	await Promise.all(protoList.map(async (protofile) => {
 		const content = await fs.readFileAsync(path.join(protoRoot, protofile), 'utf-8')
 		if (content.indexOf('package') == -1) {
-			throw `${protofile} must have "package XXX;" declare!`;
+			exception(`${protofile} must have "package XXX;" declare!`);
 		}
 	}));
 
@@ -201,44 +207,7 @@ async function generate(_rootDir: string) {
 	// gen encode decode and type check code & save file
 	if (gCfg.defOptions.outTSFile)
 	{
-		let package_def: PackageDef = await generate_tables(protoRoot, fileList);
-		const fmt_package = function(sysid: string):string { return `\t\t'${sysid}': {\n`; }
-		const fmt_type_package = function(sysid: string):string { return `\t\t${sysid}: {\n`; }
-		const fmt_message = function(cmdid: string, package_name: string): string { return `\t\t\t'${cmdid}': ${package_name},\n`; }
-		const fmt_type_message = function(sysid: string, cmdid: string, package_name: string, msgname: string): string {
-			return `\t\t\t${msgname}: <IHandler<'${sysid}', '${cmdid}'>>{s: '${sysid}', c: '${cmdid}', ns: ${sysid}, nc: ${cmdid}, pt: ${package_name}.${msgname} },\n`;
-		}
-
-		let sproto_IMsgMap = '';
-		let sproto_SCHandlerMap = '';
-		let sproto_HandlerMap = '';
-
-		for (let package_id in package_def) {
-			sproto_IMsgMap += fmt_package(package_id);
-			sproto_SCHandlerMap += fmt_package(package_id);
-			sproto_HandlerMap += fmt_type_package(package_def[package_id].package_name);
-			const p_def = package_def[package_id];
-			for (let cmd_id in p_def.message_list) {
-				sproto_IMsgMap += fmt_message(cmd_id, `${p_def.package_name}.${p_def.message_list[cmd_id].imessage_name}`);
-				sproto_SCHandlerMap += fmt_message(cmd_id, `${p_def.package_name}.${p_def.message_list[cmd_id].message_name}`);
-				sproto_HandlerMap += fmt_type_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name);
-			}
-			sproto_IMsgMap += '\t\t\t},\n';
-			sproto_SCHandlerMap += '\t\t\t},\n';
-			sproto_HandlerMap += '\t\t\t},\n';
-		}
-
-		const sproto_import_content = NullStr(gCfg.defOptions.importPath) ? `import * as protobuf from '${gCfg.defOptions.importPath}';\n` : "";
-		const sproto_reference_content = NullStr(gCfg.defOptions.referencePath) ? `/// <reference path="${gCfg.defOptions.referencePath}" />\n` : "";
-
-		const sproto_file_content = String.format(sproto_def_fmt,
-			sproto_import_content,
-			sproto_reference_content,
-			gCfg.defOptions.rootNamespace,
-			sproto_IMsgMap,
-			sproto_SCHandlerMap,
-			sproto_HandlerMap
-		);
+		const sproto_file_content =  await gen_packageCmdMode_content(protoRoot, fileList);
 		const tsCodeFilePath = path.join(_rootDir, gCfg.defOptions.outTSFile);
 		await fs.mkdirpAsync(path.dirname(tsCodeFilePath));
 		await fs.writeFileAsync(tsCodeFilePath, sproto_file_content, {encoding:'utf-8', flag:'w+'});
@@ -260,7 +229,7 @@ type PackageDef = {
 	}
 };
 
-async function generate_tables(protoRoot: string, protoFileList: string[]) {
+async function generate_packageCmdMode_tables(protoRoot: string, protoFileList: string[]) {
 	let package_def: PackageDef = { };
 	const mask_flag = '//$';
 	const package_line = 'package';
@@ -277,12 +246,16 @@ async function generate_tables(protoRoot: string, protoFileList: string[]) {
 				continue;
 			}
 			if (!line.includes(mask_flag)) {
-				throw `proto file ${protofile} package id not found`;
+				exception(`proto file ${protofile} package id not found`);
 			}
 			line = line.substr(package_line.length).trim();
 			const package_name = line.substr(0, line.indexOf(';'));
 			const spackage_id = line.substr(line.indexOf(mask_flag) + mask_flag.length).trim();
 			package_id = parseInt(spackage_id);
+			if (package_def[package_id]) {
+				exception(`package id:${yellow(package_id.toString())} redefined `
+					+ `at [${yellow(package_name)}] [${yellow(package_def[package_id].package_name)}]`);
+			}
 			package_def[package_id] = { package_name, message_list:{} };
 			break;
 		}
@@ -295,19 +268,67 @@ async function generate_tables(protoRoot: string, protoFileList: string[]) {
 				continue;
 			}
 			if (!line.includes(mask_flag)) {
-				throw `proto file ${protofile} message id not found line:\n${line}`;
+				exception(`proto file ${protofile} message id not found line:\n${line}`);
 			}
 			line = line.substr(message_line.length).trim();
 			const message_name = line.substr(0, line.indexOf(mask_flag)).trim();
 			const imessage_name = 'I' + message_name;
 			const smessage_id = line.substr(line.indexOf(mask_flag) + mask_flag.length).trim();
 			const message_id = parseInt(smessage_id);
-			package_def[package_id].message_list[message_id] = {message_name, imessage_name};
+			const message_list = package_def[package_id].message_list;
+			if (message_list[message_id]) {
+				const package_name = package_def[package_id].package_name + '.';
+				exception(`[${redBright('Message ID Redefined')}] message id:${yellow(message_id.toString())} redefined `
+					+ `at [${yellow(package_name + message_list[message_id].message_name)}] [${yellow(package_name + message_name)}]`);
+			}
+			message_list[message_id] = {message_name, imessage_name};
 		}
 	}
 
 	// logger(yellow(JSON.stringify(package_def)));
 	return package_def;
+}
+
+async function gen_packageCmdMode_content(protoRoot: string, protoFileList: string[]): Promise<string> {
+	let package_def: PackageDef = await generate_packageCmdMode_tables(protoRoot, protoFileList);
+	let sproto_IMsgMap = '';
+	let sproto_SCHandlerMap = '';
+	let sproto_HandlerMap = '';
+	const fmt_package = function(sysid: string):string { return `\t\t'${sysid}': {\n`; }
+	const fmt_type_package = function(sysid: string):string { return `\t\t${sysid}: {\n`; }
+	const fmt_message = function(cmdid: string, package_name: string): string { return `\t\t\t'${cmdid}': ${package_name},\n`; }
+	const fmt_type_message = function(sysid: string, cmdid: string, package_name: string, msgname: string): string {
+		return `\t\t\t${msgname}: <IHandler<'${sysid}', '${cmdid}'>>{s: '${sysid}', c: '${cmdid}', ns: ${sysid}, nc: ${cmdid}, pt: ${package_name}.${msgname} },\n`;
+	}
+
+
+	for (let package_id in package_def) {
+		sproto_IMsgMap += fmt_package(package_id);
+		sproto_SCHandlerMap += fmt_package(package_id);
+		sproto_HandlerMap += fmt_type_package(package_def[package_id].package_name);
+		const p_def = package_def[package_id];
+		for (let cmd_id in p_def.message_list) {
+			sproto_IMsgMap += fmt_message(cmd_id, `${p_def.package_name}.${p_def.message_list[cmd_id].imessage_name}`);
+			sproto_SCHandlerMap += fmt_message(cmd_id, `${p_def.package_name}.${p_def.message_list[cmd_id].message_name}`);
+			sproto_HandlerMap += fmt_type_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name);
+		}
+		sproto_IMsgMap += '\t\t\t},\n';
+		sproto_SCHandlerMap += '\t\t\t},\n';
+		sproto_HandlerMap += '\t\t\t},\n';
+	}
+
+	const sproto_import_content = NullStr(gCfg.defOptions.importPath) ? `import * as protobuf from '${gCfg.defOptions.importPath}';\n` : "";
+	const sproto_reference_content = NullStr(gCfg.defOptions.referencePath) ? `/// <reference path="${gCfg.defOptions.referencePath}" />\n` : "";
+
+	const sproto_file_content = String.format(sproto_def_fmt,
+		sproto_import_content,
+		sproto_reference_content,
+		gCfg.defOptions.rootNamespace,
+		sproto_IMsgMap,
+		sproto_SCHandlerMap,
+		sproto_HandlerMap
+	);
+	return sproto_file_content;
 }
 
 // main entry
