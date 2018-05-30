@@ -18,7 +18,10 @@
         "--no-convert": true,       "cmt07": "Does not generate convert functions like from/toObject",
         "--no-delimited": true,     "cmt08": "Does not generate delimited encode/decode functions.",
         "--no-beautify": false,     "cmt09": "Does not beautify generated code.",
-        "--no-comments": false,     "cmt10": "Does not output any JSDoc comments."
+        "--no-comments": false,     "cmt10": "Does not output any JSDoc comments.",
+        "--force-long": false,      "cmt11": "Enfores the use of 'Long' for s-/u-/int64 and s-/fixed64 fields.",
+        "--force-number": false,    "cmt12": "Enfores the use of 'number' for s-/u-/int64 and s-/fixed64 fields.",
+        "--force-message": false,   "cmt13": "Enfores the use of message instances instead of plain objects"
     },
     "defOptions": {
         "-c01": [

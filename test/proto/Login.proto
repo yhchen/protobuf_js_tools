@@ -13,3 +13,9 @@ message LoginRsp //$2
 {
 	required int32 code = 1;
 }
+
+message Test //$3
+{
+	required int64 code = 1;
+	required uint64 test = 2;
+}

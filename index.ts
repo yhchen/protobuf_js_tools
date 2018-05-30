@@ -78,7 +78,7 @@ function shell(command: string, args: string[]) {
 
 type ProtobufConfig = {
     "options": {
-        "-ct": [
+        "cmt01": [
                 "Specifies the target format. Also accepts a path to require a custom target.",
                 "        json           JSON representation",
                 "        json-module    JSON representation as a module",
@@ -88,15 +88,18 @@ type ProtobufConfig = {
                 "        static-module Static code without reflection as a module"
             ],
         "-t": string,
-        "--keep-case"?: boolean,		"-c02": "Keeps field casing instead of converting to camel case.",
-        "--no-create"?: boolean,		"-c03": "Does not generate create functions used for reflection compatibility.",
-        "--no-encode"?: boolean,		"-c04": "Does not generate encode functions.",
-        "--no-decode"?: boolean,		"-c05": "Does not generate decode functions.",
-        "--no-verify"?: boolean,		"-c06": "Does not generate verify functions.",
-        "--no-convert"?: boolean,	"-c07": "Does not generate convert functions like from/toObject",
-        "--no-delimited"?: boolean,	"-c08": "Does not generate delimited encode/decode functions.",
-        "--no-beautify"?: boolean,	"-c09": "Does not beautify generated code.",
-        "--no-comments"?: boolean,	"-c10": "Does not output any JSDoc comments."
+        "--keep-case"?: boolean,    "cmt02": "Keeps field casing instead of converting to camel case.",
+        "--no-create"?: boolean,    "cmt03": "Does not generate create functions used for reflection compatibility.",
+        "--no-encode"?: boolean,    "cmt04": "Does not generate encode functions.",
+        "--no-decode"?: boolean,    "cmt05": "Does not generate decode functions.",
+        "--no-verify"?: boolean,    "cmt06": "Does not generate verify functions.",
+        "--no-convert"?: boolean,   "cmt07": "Does not generate convert functions like from/toObject",
+        "--no-delimited"?: boolean, "cmt08": "Does not generate delimited encode/decode functions.",
+        "--no-beautify"?: boolean,  "cmt09": "Does not beautify generated code.",
+        "--no-comments"?: boolean,  "cmt10": "Does not output any JSDoc comments.",
+        "--force-long"?: boolean,   "cmt11": "Enfores the use of 'Long' for s-/u-/int64 and s-/fixed64 fields.",
+        "--force-number"?: boolean, "cmt12": "Enfores the use of 'number' for s-/u-/int64 and s-/fixed64 fields.",
+        "--force-message"?: boolean,"cmt13": "Enfores the use of message instances instead of plain objects"
     },
     "defOptions": {
         "-c01": [
@@ -216,8 +219,11 @@ async function generate(_rootDir: string) {
 	// gen .d.ts file
 	await shell('pbts', ['--main', jsOutFile, '-o', tempfile]);
 	let pbtsResult = await fs.readFileAsync(tempfile, 'utf-8');
+	if (gCfg.defOptions.nodejsMode) {
+		pbtsResult = `/// <reference types="protobufjs" />';\n\n` + pbtsResult;
+	}
+	pbtsResult = pbtsResult.replace(/: Long;/gi, ': protobuf.Long;').replace(/(number\|Long)/gi, '(number|protobuf.Long)');
 	pbtsResult = pbtsResult.replace(/\$protobuf/gi, 'protobuf').replace(/export namespace/gi, 'declare namespace');
-	pbtsResult = 'type Long = protobuf.Long;\n' + pbtsResult;
 	let tsOutFile = gCfg.outputTSFile ? path.join(_rootDir, gCfg.outputTSFile) : jsOutFile.substr(0, jsOutFile.lastIndexOf('.js')) + '.d.ts';
 	logger(`gen ts file :${green(tsOutFile)}`);
 	logger(`file size   :${yellow(format_size(pbtsResult.length))}`);
