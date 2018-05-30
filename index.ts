@@ -199,7 +199,11 @@ async function generate(_rootDir: string) {
 	}
 	await shell('pbjs', args);
 	let pbjsResult = await fs.readFileAsync(tempfile, 'utf-8');
-	pbjsResult = 'var $protobuf = window.protobuf;\n$protobuf.roots.default=window;\n' + pbjsResult;
+	if (gCfg.defOptions.nodejsMode) {
+		pbjsResult = 'var $protobuf = window.protobuf;\n$protobuf.roots.default=window;\n' + pbjsResult;
+	} else {
+		pbjsResult = 'var $protobuf = window.protobuf;\n$protobuf.roots.default=window;\n' + pbjsResult;
+	}
 	logger(`gen js file :${green(jsOutFile)}`);
 	logger(`file size   :${yellow(format_size(pbjsResult.length))}`);
 	await fs.writeFileAsync(jsOutFile, pbjsResult, 'utf-8');
