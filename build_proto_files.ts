@@ -39,9 +39,9 @@ function NullStr(s: string): boolean {
 function FindWords(s: string, start?:number): number {
 	const words = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_';
 	for (let i = start?start:0; i < s.length; ++i) {
-		if (!words.includes(s[i])) return i;
+		if (words.indexOf(s[i]) < 0) return i;
 	}
-	return -1;
+	return s.length;
 }
 
 const green = chalk.default.greenBright;
@@ -224,8 +224,8 @@ async function generate(_rootDir: string) {
 	if (!NullStr(gCfg.defOptions.outTSFile))
 	{
 		const sproto_file_content = gCfg.defOptions.packageCmdMode
-							? await gen_packageCmdMode_content(protoRoot, fileList)
-							: await gen_NormalMode_content(protoRoot, fileList);
+							? await gen_packageCmdMode_content(protoRoot, protoList)
+							: await gen_NormalMode_content(protoRoot, protoList);
 		const tsCodeFilePath = path.join(_rootDir, gCfg.defOptions.outTSFile);
 		await fs.mkdirpAsync(path.dirname(tsCodeFilePath));
 		await fs.writeFileAsync(tsCodeFilePath, sproto_file_content, {encoding:'utf-8', flag:'w+'});
