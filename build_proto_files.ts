@@ -183,7 +183,7 @@ async function generate(_rootDir: string) {
 		}\n\
 	}\n\
 \n\
-	export function DecodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, buffer: Uint8Array) : IMsgMap[T][T1] {\n\
+	export function DecodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, buffer: Uint8Array) : IMsgMap[T][T1]|undefined {\n\
 		try {\n\
 			return _handler.pt.decode(buffer);\n\
 		} catch (ex) {\n\
@@ -211,7 +211,7 @@ async function generate(_rootDir: string) {
 		}\n\
 	}\n\
 \n\
-	export function DecodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(sysid: T, cmdid: T1, buffer: Uint8Array) : IMsgMap[T][T1] {\n\
+	export function DecodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(sysid: T, cmdid: T1, buffer: Uint8Array) : IMsgMap[T][T1]|undefined {\n\
 		const package_handler = SCHandlerMap[sysid];\n\
 		if (package_handler == null) {\n\
 			console.error(`Decode Proto failure. package type sysid:[${sysid}] cmdid:${cmdid}] not found.`);\n\
