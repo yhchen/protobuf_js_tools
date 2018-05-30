@@ -41,6 +41,6 @@ call tsc -p .
 
 echo ======================================================
 echo = execute build proto
-call node ./bin/build_proto_files.js
+call node ./bin/index.js
 
 pause
