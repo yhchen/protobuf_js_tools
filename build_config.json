@@ -1,19 +1,44 @@
 {
     "options": {
+        "cmt01": [
+                "Specifies the target format. Also accepts a path to require a custom target.",
+                "        json           JSON representation",
+                "        json-module    JSON representation as a module",
+                "        proto2         Protocol Buffers, Version 2",
+                "        proto3         Protocol Buffers, Version 3",
+                "        static         Static code without reflection (non-functional on its own)",
+                "        static-module Static code without reflection as a module"
+            ],
         "-t": "static",
-        "--keep-case": false,
-        "--no-create": true,
-        "--no-encode": false,
-        "--no-decode": false,
-        "--no-verify": true,
-        "--no-convert": true,
-        "--no-delimited": true,
-        "--no-beautify": false,
-        "--no-comments": false
+        "--keep-case": false,       "cmt02": "Keeps field casing instead of converting to camel case.",
+        "--no-create": true,        "cmt03": "Does not generate create functions used for reflection compatibility.",
+        "--no-encode": false,       "cmt04": "Does not generate encode functions.",
+        "--no-decode": false,       "cmt05": "Does not generate decode functions.",
+        "--no-verify": true,        "cmt06": "Does not generate verify functions.",
+        "--no-convert": true,       "cmt07": "Does not generate convert functions like from/toObject",
+        "--no-delimited": true,     "cmt08": "Does not generate delimited encode/decode functions.",
+        "--no-beautify": false,     "cmt09": "Does not beautify generated code.",
+        "--no-comments": false,     "cmt10": "Does not output any JSDoc comments."
     },
-    "importProtoBuffPath": "../../includes/protobuf",
+    "defOptions": {
+        "-c01": [
+            "use packageID and cmdID mode for network use",
+            "       if use packageCmdMode, add //$<ID:number> after package line and message line",
+            "       example:",
+            "           package Test; //$1",
+            "           message Msg //$1",
+            "           {",
+            "               ...",
+            "           }"
+            ],
+        "packageCmdMode": true,
+        "rootNamespace": "ProtoDef",                    "-c02": "root namespace for export file",
+        "nodejsMode": true,                             "-c03": "nodejs mode for `export`",
+        "importPath": "../../includes/protobuf",        "-c04":" import protobuf file(for nodejs)",
+		"referencePath": "./protobuf-static.d.ts",      "-c05": "/// <reference path=\"<You Path Here>\" />",
+        "outTSFile": "./test/static-code/proto_def.ts"
+    },
     "sourceRoot": "./test/proto/",
     "outputFile": "./test/static-code/protobuf-static.js",
-    "outputTSFile": "./test/static-code/protobuf-static.d.ts",
-    "outputTSCodeFile": "./test/static-code/proto_def.ts"
+    "outputTSFile": "./test/static-code/protobuf-static.d.ts"
 }
