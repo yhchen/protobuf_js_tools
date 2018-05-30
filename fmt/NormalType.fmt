@@ -18,7 +18,7 @@ type _DefKeyEnum<T> = {
 	[P in keyof T]: P
 };
 
-{5}const NotifyType: _DeepReadonly<_DefKeyEnum<INotifyType>> = {
+{6}const NotifyType: _DeepReadonly<_DefKeyEnum<INotifyType>> = {
 {4}
 }
 
@@ -27,8 +27,8 @@ function _DeclareDefKeyName<T>(): _DefKeyEnum<T> {
 	return result;
 }
 
-function RegNotify<T extends keyof typeof NotifyType>(eventType: T, listener:(data: _DeepReadonly<INotifyType[T]>)=>void): void {
+export function RegNotify<T extends keyof typeof NotifyType>(eventType: T, listener:(data: _DeepReadonly<INotifyType[T]>)=>void): void {
 }
 
-{3}
+{5}
 
