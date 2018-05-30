@@ -310,18 +310,20 @@ async function generate_packageCmdMode_tables(protoRoot: string, protoFileList: 
 type NormalModeDef = {
 	[package_name: string]: {
 		message_list : string[]
+	},
+	'__None_NameSpace__': {message_list: string[]
 	}
 };
 
 async function generate_NormalMode_tables(protoRoot: string, protoFileList: string[]) {
-	let package_def: NormalModeDef = { };
+	let package_def: NormalModeDef = { '__None_NameSpace__':{message_list:[]} };
 	const package_line = 'package';
 	const message_line = 'message';
 	for (let protofile of protoFileList) {
 		let fcontent = await fs.readFileAsync(path.join(protoRoot, protofile), 'utf-8');
 		let lines = fcontent.split('\n');
 		// find package first
-		let package_name = '';
+		let package_name = '__None_NameSpace__';
 		while (lines.length > 0) {
 			let line = lines.shift().trim();
 			// not package line
@@ -359,8 +361,13 @@ async function gen_NormalMode_content(protoRoot: string, protoFileList: string[]
 
 	for (let pname in package_def) {
 		for (let cname of package_def[pname].message_list) {
-			sproto_INotifyType += `\t\t		'${pname}_${cname}': ${pname}.I${cname},\n`;
-			sproto_NotifyType += `\t\t		${pname}_${cname}: '${pname}_${cname}',\n`;
+			if (cname != '__None_NameSpace__') {
+				sproto_INotifyType += `\t\t		'${pname}_${cname}': ${pname}.I${cname},\n`;
+				sproto_NotifyType += `\t\t		${pname}_${cname}: '${pname}_${cname}',\n`;
+			} else {
+				sproto_INotifyType += `\t\t		'${cname}': I${cname},\n`;
+				sproto_NotifyType += `\t\t		${cname}: '${cname}',\n`;
+			}
 		}
 	}
 
@@ -400,9 +407,9 @@ async function gen_packageCmdMode_content(protoRoot: string, protoFileList: stri
 			sproto_SCHandlerMap += fmt_message(cmd_id, `${p_def.package_name}.${p_def.message_list[cmd_id].message_name}`);
 			sproto_HandlerMap += fmt_type_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name);
 		}
-		sproto_IMsgMap += '\t\t\t},\n';
-		sproto_SCHandlerMap += '\t\t\t},\n';
-		sproto_HandlerMap += '\t\t\t},\n';
+		sproto_IMsgMap += '\t\t},\n';
+		sproto_SCHandlerMap += '\t\t},\n';
+		sproto_HandlerMap += '\t\t},\n';
 	}
 
 	const sproto_import_content = !NullStr(gCfg.defOptions.importPath) ? `import * as protobuf from '${gCfg.defOptions.importPath}';\n` : "";
