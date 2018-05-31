@@ -1,5 +1,7 @@
+// Login package
 package Login; //$1
 
+// login request proto
 message LoginReq //$1
 {
 	required string account = 1;
@@ -9,11 +11,13 @@ message LoginReq //$1
 
 }
 
+// login response proto
 message LoginRsp //$2
 {
 	required int32 code = 1;
 }
 
+// test script
 message Test //$3
 {
 	required int64 code = 1;

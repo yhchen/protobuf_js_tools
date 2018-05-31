@@ -257,8 +257,9 @@ async function generate(_rootDir: string) {
 type PackageCmdModeDef = {
 	[package_id: number]: {
 		package_name: string,
+		commemt?: string,
 		message_list : {
-			[message_id: number]: { message_name: string, imessage_name: string }
+			[message_id: number]: { message_name: string, imessage_name: string, comment?: string }
 		}
 	}
 };
@@ -272,9 +273,12 @@ async function generate_packageCmdMode_tables(protoRoot: string, protoFileList: 
 		let fcontent = await fs.readFileAsync(path.join(protoRoot, protofile), 'utf-8');
 		let lines = fcontent.split('\n');
 		let package_id = 0;
+		let lastline = '';
+		let line = '';
 		// find package first
 		while (lines.length > 0) {
-			let line = lines.shift().trim();
+			lastline = line;
+			line = lines.shift().trim();
 			// not package line
 			if (line.substr(0, package_line.length) != package_line) {
 				continue;
@@ -291,12 +295,18 @@ async function generate_packageCmdMode_tables(protoRoot: string, protoFileList: 
 					+ `at [${yellow(package_name)}] [${yellow(package_def[package_id].package_name)}]`);
 			}
 			package_def[package_id] = { package_name, message_list:{} };
+			lastline = lastline.trim();
+			if (lastline.indexOf('//') == 0) {
+				package_def[package_id].commemt = lastline;
+			}
 			break;
 		}
 
+		lastline = line = '';
 		// find message
 		while (lines.length > 0) {
-			let line = lines.shift().trim();
+			lastline = line;
+			line = lines.shift().trim();
 			// not message line
 			if (line.substr(0, message_line.length) != message_line) {
 				continue;
@@ -316,6 +326,10 @@ async function generate_packageCmdMode_tables(protoRoot: string, protoFileList: 
 					+ `at [${yellow(package_name + message_list[message_id].message_name)}] [${yellow(package_name + message_name)}]`);
 			}
 			message_list[message_id] = {message_name, imessage_name};
+			lastline = lastline.trim();
+			if (lastline.indexOf('//') == 0) {
+				message_list[message_id].comment = lastline;
+			}
 		}
 	}
 
@@ -325,9 +339,12 @@ async function generate_packageCmdMode_tables(protoRoot: string, protoFileList: 
 
 type NormalModeDef = {
 	[package_name: string]: {
-		message_list : string[]
+		message_list : { name: string, comment?: string }[],
+		comment?: string,
 	},
-	'__None_NameSpace__': {message_list: string[]
+	'__None_NameSpace__': {
+		message_list: { name: string, comment?: string }[],
+		comment?: string,
 	}
 };
 
@@ -342,8 +359,11 @@ async function generate_NormalMode_tables(protoRoot: string, protoFileList: stri
 		let package_name = '__None_NameSpace__';
 		let found_package = false;
 		let index = 0;
+		let lastline = '';
+		let line = '';
 		for (; index < lines.length; ++index) {
-			let line = lines[index].trim();
+			lastline = line;
+			line = lines[index].trim();
 			// not package line
 			if (line.substr(0, package_line.length) != package_line) {
 				continue;
@@ -355,6 +375,10 @@ async function generate_NormalMode_tables(protoRoot: string, protoFileList: stri
 			}
 			package_def[package_name] = { message_list:[] };
 			found_package = true;
+			lastline = lastline.trim();
+			if (lastline.indexOf('//') == 0) {
+				package_def[package_name].comment = lastline;
+			}
 			break;
 		}
 
@@ -362,16 +386,24 @@ async function generate_NormalMode_tables(protoRoot: string, protoFileList: stri
 			index = 0;
 		}
 
+		lastline = line = '';
 		// find message
 		for (; index < lines.length; ++index) {
-			let line = lines[index].trim();
+			lastline = line;
+			line = lines[index].trim();
 			// not message line
 			if (line.substr(0, message_line.length) != message_line) {
 				continue;
 			}
 			line = line.substr(message_line.length).trim();
 			const message_name = line.substr(0, FindWords(line)).trim();
-			package_def[package_name].message_list.push(message_name);
+
+			lastline = lastline.trim();
+			if (lastline.indexOf('//') == 0) {
+				package_def[package_name].message_list.push({name:message_name, comment:lastline});
+			} else {
+				package_def[package_name].message_list.push({name:message_name});
+			}
 		}
 	}
 	return package_def;
@@ -384,12 +416,19 @@ async function gen_NormalMode_content(protoRoot: string, protoFileList: string[]
 	let sproto_NotifyType = '';
 
 	for (let pname in package_def) {
-		for (let cname of package_def[pname].message_list) {
+		if (package_def[pname].comment) {
+			// TODO : Add Package Comment
+		}
+		for (let cmessage of package_def[pname].message_list) {
+			const cname = cmessage.name;
 			if (pname != '__None_NameSpace__') {
-				sproto_INotifyType += `\t'${pname}_${cname}': ${sproto_protobuf_import}${pname}.I${cname},\n`;
-				sproto_NotifyType += `\t${pname}_${cname}: '${pname}_${cname}',\n`;
+				sproto_INotifyType += `\t'${pname}_${cname}': ${sproto_protobuf_import}${pname}.I${cname},${cmessage.comment? '\t' + cmessage.comment : ''}\n`;
+				sproto_NotifyType += `${cmessage.comment?'\t'+cmessage.comment+'\n':''}\t${pname}_${cname}: '${pname}_${cname}',\n`;
 			} else {
 				sproto_INotifyType += `\t'${cname}': ${sproto_protobuf_import}I${cname},\n`;
+				if (cmessage.comment) {
+					sproto_NotifyType += `\t${cmessage.comment}\n`;
+				}
 				sproto_NotifyType += `\t${cname}: '${cname}',\n`;
 			}
 		}
@@ -426,26 +465,26 @@ async function gen_packageCmdMode_content(protoRoot: string, protoFileList: stri
 	let sproto_SCHandlerMap = '';
 	let sproto_HandlerMap = '';
 	const sproto_protobuf_import = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.importPath) ? 'p.' : '';
-	const fmt_package = function(sysid: string):string { return `\t'${sysid}': {\n`; }
-	const fmt_type_package = function(sysid: string):string { return `\t${sysid}: {\n`; }
-	const fmt_message = function(cmdid: string, package_name: string, message_name: string): string {
-		return `\t\t'${cmdid}': ${sproto_protobuf_import}${package_name}.${message_name},\n`;
+	const fmt_package = function(sysid: string, comment?: string):string { return `${comment?'\t'+comment+'\n':''}\t'${sysid}': {\n`; }
+	const fmt_type_package = function(sysid: string, comment?: string):string { return `${comment?'\t'+comment+'\n':''}\t${sysid}: {\n`; }
+	const fmt_message = function(cmdid: string, package_name: string, message_name: string, comment?: string): string {
+		return `${comment?'\t\t'+comment+'\n':''}\t\t'${cmdid}': ${sproto_protobuf_import}${package_name}.${message_name},\n`;
 	}
-	const fmt_type_message = function(sysid: string, cmdid: string, package_name: string, msgname: string): string {
-		return `\t\t${msgname}: <IHandler<'${sysid}', '${cmdid}'>>{s: '${sysid}', c: '${cmdid}', ns: ${sysid}, nc: ${cmdid}, `
+	const fmt_type_message = function(sysid: string, cmdid: string, package_name: string, msgname: string, comment?: string): string {
+		return `${comment?'\t\t'+comment+'\n':''}\t\t${msgname}: <IHandler<'${sysid}', '${cmdid}'>>{s: '${sysid}', c: '${cmdid}', ns: ${sysid}, nc: ${cmdid}, `
 					+ `pt: ${sproto_protobuf_import}${package_name}.${msgname} },\n`;
 	}
 
 
 	for (let package_id in package_def) {
-		sproto_IMsgMap += fmt_package(package_id);
-		sproto_SCHandlerMap += fmt_package(package_id);
-		sproto_HandlerMap += fmt_type_package(package_def[package_id].package_name);
+		sproto_IMsgMap += fmt_package(package_id/*, package_def[package_id].commemt*/);
+		sproto_SCHandlerMap += fmt_package(package_id/*, package_def[package_id].commemt*/);
+		sproto_HandlerMap += fmt_type_package(package_def[package_id].package_name, package_def[package_id].commemt);
 		const p_def = package_def[package_id];
 		for (let cmd_id in p_def.message_list) {
 			sproto_IMsgMap += fmt_message(cmd_id, p_def.package_name, p_def.message_list[cmd_id].imessage_name);
 			sproto_SCHandlerMap += fmt_message(cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name);
-			sproto_HandlerMap += fmt_type_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name);
+			sproto_HandlerMap += fmt_type_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name, p_def.message_list[cmd_id].comment);
 		}
 		sproto_IMsgMap += '\t},\n';
 		sproto_SCHandlerMap += '\t},\n';
