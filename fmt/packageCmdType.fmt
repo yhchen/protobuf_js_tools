@@ -39,14 +39,16 @@ const _HandlerMap = {
 	} catch (ex) {
 		console.error(`Encode package_id:${_handler.s} message_id:${_handler.c} failure. error:${ex}`);
 	}
+	return undefined;
 }
 
-{7}function DecodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, buffer: Uint8Array) : IMsgMap[T][T1] {
+{7}function DecodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, buffer: Uint8Array) : IMsgMap[T][T1]|undefined {
 	try {
 		return _handler.pt.decode(buffer);
 	} catch (ex) {
 		console.error(`Decode package_id:${_handler.s} message_id:${_handler.c} failure. error:${ex}`);
 	}
+	return undefined;
 }
 
 
@@ -54,12 +56,12 @@ const _HandlerMap = {
 	const package_handler = SCHandlerMap[package_id];
 	if (package_handler == null) {
 		console.error(`Encode Proto failure. package type package_id:[${package_id}] message_id:${message_id}] not found.`);
-		return;
+		return undefined;
 	}
 	const cmd_handler = package_handler[<string>message_id];
 	if (cmd_handler == null) {
 		console.error(`Encode Proto failure. proto type package_id:[${package_id}] message_id:${message_id}] not found.`);
-		return;
+		return undefined;
 	}
 	try {
 		let buffer: protobuf.Writer = cmd_handler.encode(proto);
@@ -67,24 +69,26 @@ const _HandlerMap = {
 	} catch (ex) {
 		console.error(`Encode package_id:${package_id} message_id:${message_id} failure. error:${ex}`);
 	}
+	return undefined;
 }
 
-{7}function DecodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(package_id: T, message_id: T1, buffer: Uint8Array) : IMsgMap[T][T1] {
+{7}function DecodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(package_id: T, message_id: T1, buffer: Uint8Array) : IMsgMap[T][T1]|undefined {
 	const package_handler = SCHandlerMap[package_id];
 	if (package_handler == null) {
 		console.error(`Decode Proto failure. package type package_id:[${package_id}] message_id:${message_id}] not found.`);
-		return;
+		return undefined;
 	}
 	const cmd_handler = package_handler[<string>message_id];
 	if (cmd_handler == null) {
 		console.error(`Decode Proto failure. proto type package_id:[${package_id}] message_id:${message_id}] not found.`);
-		return;
+		return undefined;
 	}
 	try {
 		return cmd_handler.decode(buffer);
 	} catch (ex) {
 		console.error(`Decode package_id:${package_id} message_id:${message_id} failure. error:${ex}`);
 	}
+	return undefined;
 }
 
 {6}

@@ -22,12 +22,9 @@ type _DefKeyEnum<T> = {
 {4}
 }
 
-function _DeclareDefKeyName<T>(): _DefKeyEnum<T> {
-	const result: _DefKeyEnum<T>|any = {};
-	return result;
-}
-
 {6}function RegNotify<T extends keyof typeof NotifyType>(eventType: T, listener:(data: _DeepReadonly<INotifyType[T]>)=>void): void {
+	eventType;
+	listener;
 }
 
 {5}

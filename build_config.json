@@ -9,7 +9,7 @@
                 "        static         Static code without reflection (non-functional on its own)",
                 "        static-module Static code without reflection as a module"
             ],
-        "-t": "static",
+        "-t": "static-module",
         "--keep-case": false,       "cmt02": "Keeps field casing instead of converting to camel case.",
         "--no-create": true,        "cmt03": "Does not generate create functions used for reflection compatibility.",
         "--no-encode": false,       "cmt04": "Does not generate encode functions.",
@@ -34,12 +34,11 @@
             "               ...",
             "           }"
             ],
-        "packageCmdMode": false,
+        "packageCmdMode": true,
         "rootNamespace": "ProtoDef",                    "-c02": "root namespace for export file",
         "nodejsMode": true,                             "-c03": "nodejs mode for `export`",
-        "importPath": "../../includes/protobuf",        "-c04": "import protobuf file(only available for nodejsMode=true)",
-		"referencePath": "./protobuf-static.d.ts",      "-c05": "/// <reference path=\"<You Path Here>\" />(only available for nodejsMode=true)",
-        "outTSFile": "./test/static-code/proto_def.ts"
+        "importPath": "protobufjs/minimal",             "-c04": "import protobuf file(only available for nodejsMode=true)",
+        "outTSFile": "./test/def/proto_def.ts"
     },
     "sourceRoot": "./test/proto/",
     "outputFile": "./test/static-code/protobuf-static.js",
