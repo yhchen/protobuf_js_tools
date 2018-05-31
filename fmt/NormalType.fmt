@@ -22,10 +22,17 @@ type _DefKeyEnum<T> = {
 {4}
 }
 
-{6}function RegNotify<T extends keyof typeof NotifyType>(eventType: T, listener:(data: _DeepReadonly<INotifyType[T]>)=>void): void {
-	eventType;
-	listener;
-}
+/* // for example useage
+ * {6}function RegNotify<T extends keyof typeof NotifyType>(eventType: T, listener:(data: _DeepReadonly<INotifyType[T]>)=>void): void {
+ * 	eventType;
+ * 	listener;
+ * }
+ * // for example useage
+ * {6}function DispatchNotify<T extends keyof typeof NotifyType>(eventType: T, data?:_DeepReadonly<INotifyType[T]>): void {
+ * 	eventType;
+ * 	data;
+ * }
+ */
 
 {5}
 

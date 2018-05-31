@@ -151,8 +151,6 @@ const fmt_file_list = {
 	logger(whiteBright(`load fmt file success!`));
 }
 
-console.log(path.relative(path.dirname(gCfg.defOptions.outTSFile), gCfg.outputFile));
-
 function format_size(size: number): string {
 	if (size < 1024) {
 		return `${size}B`;
@@ -388,11 +386,11 @@ async function gen_NormalMode_content(protoRoot: string, protoFileList: string[]
 	for (let pname in package_def) {
 		for (let cname of package_def[pname].message_list) {
 			if (pname != '__None_NameSpace__') {
-				sproto_INotifyType += `\t\t'${pname}_${cname}': ${sproto_protobuf_import}${pname}.I${cname},\n`;
-				sproto_NotifyType += `\t\t${pname}_${cname}: '${pname}_${cname}',\n`;
+				sproto_INotifyType += `\t'${pname}_${cname}': ${sproto_protobuf_import}${pname}.I${cname},\n`;
+				sproto_NotifyType += `\t${pname}_${cname}: '${pname}_${cname}',\n`;
 			} else {
-				sproto_INotifyType += `\t\t'${cname}': ${sproto_protobuf_import}I${cname},\n`;
-				sproto_NotifyType += `\t\t${cname}: '${cname}',\n`;
+				sproto_INotifyType += `\t'${cname}': ${sproto_protobuf_import}I${cname},\n`;
+				sproto_NotifyType += `\t${cname}: '${cname}',\n`;
 			}
 		}
 	}
@@ -428,13 +426,13 @@ async function gen_packageCmdMode_content(protoRoot: string, protoFileList: stri
 	let sproto_SCHandlerMap = '';
 	let sproto_HandlerMap = '';
 	const sproto_protobuf_import = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.importPath) ? 'p.' : '';
-	const fmt_package = function(sysid: string):string { return `\t\t'${sysid}': {\n`; }
-	const fmt_type_package = function(sysid: string):string { return `\t\t${sysid}: {\n`; }
+	const fmt_package = function(sysid: string):string { return `\t'${sysid}': {\n`; }
+	const fmt_type_package = function(sysid: string):string { return `\t${sysid}: {\n`; }
 	const fmt_message = function(cmdid: string, package_name: string, message_name: string): string {
-		return `\t\t\t'${cmdid}': ${sproto_protobuf_import}${package_name}.${message_name},\n`;
+		return `\t\t'${cmdid}': ${sproto_protobuf_import}${package_name}.${message_name},\n`;
 	}
 	const fmt_type_message = function(sysid: string, cmdid: string, package_name: string, msgname: string): string {
-		return `\t\t\t${msgname}: <IHandler<'${sysid}', '${cmdid}'>>{s: '${sysid}', c: '${cmdid}', ns: ${sysid}, nc: ${cmdid}, `
+		return `\t\t${msgname}: <IHandler<'${sysid}', '${cmdid}'>>{s: '${sysid}', c: '${cmdid}', ns: ${sysid}, nc: ${cmdid}, `
 					+ `pt: ${sproto_protobuf_import}${package_name}.${msgname} },\n`;
 	}
 
@@ -449,9 +447,9 @@ async function gen_packageCmdMode_content(protoRoot: string, protoFileList: stri
 			sproto_SCHandlerMap += fmt_message(cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name);
 			sproto_HandlerMap += fmt_type_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name);
 		}
-		sproto_IMsgMap += '\t\t},\n';
-		sproto_SCHandlerMap += '\t\t},\n';
-		sproto_HandlerMap += '\t\t},\n';
+		sproto_IMsgMap += '\t},\n';
+		sproto_SCHandlerMap += '\t},\n';
+		sproto_HandlerMap += '\t},\n';
 	}
 
 	const sproto_export = gCfg.defOptions.nodejsMode ? 'export ' : '';
