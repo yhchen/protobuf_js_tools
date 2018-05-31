@@ -1,4 +1,5 @@
 /package-lock.json
 /bin
 /node_modules
-/test/static-code
+test/static-code
+test/def
