@@ -20,7 +20,7 @@
     "@types/node": "^8.10.17",
     "@types/protobufjs": "^6.0.0",
     "@types/uglify-js": "^3.0.2",
-    "typescript": "^2.8.3"
+    "typescript": "^2.9.1"
   },
   "repository": {
     "type": "git",
