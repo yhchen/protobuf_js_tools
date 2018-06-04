@@ -12,7 +12,8 @@
             "outFiles": [
                 "${workspaceRoot}/**/*.js"
             ],
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "preLaunchTask": "shell"
         }
     ]
 }

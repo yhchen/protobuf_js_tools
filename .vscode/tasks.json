@@ -11,7 +11,7 @@
             ],
             "group": {
                 "kind": "build",
-                "isDefault": true,
+                "isDefault": true
             },
             "isBackground": true,
             "presentation": {
@@ -20,6 +20,18 @@
                 "focus": false,
                 "panel": "dedicated"
             }
+        },
+        {
+            "label": "shell",
+            "type": "shell",
+            "command":{
+                "quoting": "strong",
+                "value": "./!run"
+            },
+            "args": [
+                "0"
+            ],
+            "problemMatcher": "$msCompile"
         }
     ]
 }
