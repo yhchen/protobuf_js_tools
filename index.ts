@@ -415,6 +415,13 @@ async function gen_NormalMode_content(protoRoot: string, protoFileList: string[]
 	let sproto_INotifyType = '';
 	let sproto_NotifyType = '';
 
+	let package_count = 0;
+	for (let _ in package_def)
+	{
+		++package_count;
+	}
+	logger(yellow(package_count.toString()));
+
 	for (let pname in package_def) {
 		if (package_def[pname].comment) {
 			// TODO : Add Package Comment
@@ -422,14 +429,16 @@ async function gen_NormalMode_content(protoRoot: string, protoFileList: string[]
 		for (let cmessage of package_def[pname].message_list) {
 			const cname = cmessage.name;
 			if (pname != '__None_NameSpace__') {
-				sproto_INotifyType += `\t'${pname}_${cname}': ${sproto_protobuf_import}${pname}.I${cname},${cmessage.comment? '\t' + cmessage.comment : ''}\n`;
-				sproto_NotifyType += `${cmessage.comment?'\t'+cmessage.comment+'\n':''}\t${pname}_${cname}: '${pname}_${cname}',\n`;
+				if (package_count <= 2) {
+					sproto_INotifyType += `\t'${cname}': ${sproto_protobuf_import}${pname}.I${cname},${cmessage.comment? '\t' + cmessage.comment : ''}\n`;
+					sproto_NotifyType += `${cmessage.comment?'\t'+cmessage.comment+'\n':''}\t${cname}: '${cname}',\n`;
+				} else {
+					sproto_INotifyType += `\t'${pname}_${cname}': ${sproto_protobuf_import}${pname}.I${cname},${cmessage.comment? '\t' + cmessage.comment : ''}\n`;
+					sproto_NotifyType += `${cmessage.comment?'\t'+cmessage.comment+'\n':''}\t${pname}_${cname}: '${pname}_${cname}',\n`;
+				}
 			} else {
 				sproto_INotifyType += `\t'${cname}': ${sproto_protobuf_import}I${cname},\n`;
-				if (cmessage.comment) {
-					sproto_NotifyType += `\t${cmessage.comment}\n`;
-				}
-				sproto_NotifyType += `\t${cname}: '${cname}',\n`;
+				sproto_NotifyType += `${cmessage.comment?'\t'+cmessage.comment+'\n':''}\t${cname}: '${cname}',\n`;
 			}
 		}
 	}
