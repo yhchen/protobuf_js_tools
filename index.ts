@@ -5,6 +5,7 @@ import * as UglifyJS from 'uglify-js';
 import * as os from 'os';
 import * as chalk from 'chalk';
 import { isString, isBoolean } from 'util';
+import { sprintf } from 'sprintf-js'
 
 declare class String {
 	static format(fmt:string, ...replacements: string[]): string;
@@ -103,32 +104,34 @@ type ProtobufConfig = {
     },
     "defOptions": {
         "-c01": [
-            "use packageID and cmdID mode for network use",
-            "       if use packageCmdMode, add //$<ID:number> after package line and message line",
-            "       example:",
-            "           package Test; //$1",
-            "           message Msg //$1",
-            "           {",
-            "               ...",
-            "           }"
+            "Gen Mode:",
+            "       [Normal]          : Use Package Name and Message Name to Direct proto",
+            "       [PackageCmd]      : Use Package Id and Message Id to Direct proto",
+            "       [PackageCmdFast]  : Use Package Id and Message Id to Direct proto(faster and shorter than PackageCmd Mode",
+            "",
+            "For [PackageCmd] [PackageCmdFast] Mode. Use packageID and cmdID mode for network use",
+            "        if use packageCmdMode, add //$<ID:number> after package line and message line",
+            "        example:",
+            "            package Test; //$1",
+            "            message Msg //$1",
+            "            {",
+            "                ...",
+            "            }"
             ],
-        "packageCmdMode": boolean,
-        "rootNamespace": string,        "-c02": "root namespace for export file",
-        "nodejsMode": boolean,          "-c03": "nodejs mode for `export`",
-		"importPath"?: string,          "-c04": "import protobuf file(for nodejs)",
-		"outTSFile": string
+        "GenMode": string,
+        "packageCmdFmt": string,        "-c02": "package cmd mode id format(for packageageCmdMode=true)",
+        "rootNamespace": string,        "-c03": "root namespace for export file",
+        "nodejsMode": boolean,          "-c04": "nodejs mode for `export`",
+        "importPath"?: string,          "-c05": "import protobuf file(for nodejs)",
+        "outTSFile": string
     },
-	"sourceRoot": string,
-	"outputFile": string,
-	"outputTSFile": string,
+    "sourceRoot": string,
+    "outputFile": string,
+    "outputTSFile": string,
 }
 
 
 const config_file_path = './build_config.json'
-const fmt_file_list = {
-	true: './fmt/packageCmdType.fmt',
-	false: './fmt/NormalType.fmt',
-};
 
 // load config file
 {
@@ -143,7 +146,7 @@ const fmt_file_list = {
 
 // load fmt file
 {
-	let fmt_file_path: string = fmt_file_list[`${gCfg.defOptions.packageCmdMode}`];
+	let fmt_file_path: string = `./fmt/${gCfg.defOptions.GenMode}.fmt`;
 	if (!fs.existsSync(fmt_file_path)) {
 		exception(`fmt file ${fmt_file_path} not found`);
 	}
@@ -177,7 +180,7 @@ async function generate(_rootDir: string) {
 	}
 	logger(`found .proto:${green(protoList.toString())}`);
 
-	if (gCfg.defOptions.packageCmdMode) {
+	if (gCfg.defOptions.GenMode.indexOf('PackageCmd') == 0) {
 			await Promise.all(protoList.map(async (protofile) => {
 				const content = await fs.readFileAsync(path.join(protoRoot, protofile), 'utf-8')
 				if (content.indexOf('package') == -1) {
@@ -239,9 +242,19 @@ async function generate(_rootDir: string) {
 	// gen encode decode and type check code & save file
 	if (!NullStr(gCfg.defOptions.outTSFile))
 	{
-		const sproto_file_content = gCfg.defOptions.packageCmdMode
-							? await gen_packageCmdMode_content(protoRoot, protoList)
-							: await gen_NormalMode_content(protoRoot, protoList);
+		let sproto_file_content = null;
+		switch (gCfg.defOptions.GenMode)
+		{
+		case "Normal":
+			sproto_file_content = await gen_NormalMode_content(protoRoot, protoList);
+			break;
+		case "PackageCmd":
+			sproto_file_content = await gen_packageCmdMode_content(protoRoot, protoList);
+			break;
+		case "PackageCmdFast":
+			sproto_file_content = await gen_packageCmdFastMode_content(protoRoot, protoList);
+			break;
+		}
 		const tsCodeFilePath = path.join(_rootDir, gCfg.defOptions.outTSFile);
 		await fs.mkdirpAsync(path.dirname(tsCodeFilePath));
 		await fs.writeFileAsync(tsCodeFilePath, sproto_file_content, {encoding:'utf-8', flag:'w+'});
@@ -498,6 +511,64 @@ async function gen_packageCmdMode_content(protoRoot: string, protoFileList: stri
 		sproto_IMsgMap += '\t},\n';
 		sproto_SCHandlerMap += '\t},\n';
 		sproto_HandlerMap += '\t},\n';
+	}
+
+	const sproto_export = gCfg.defOptions.nodejsMode ? 'export ' : '';
+	const sproto_import_content = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.importPath)
+						? `import * as protobuf from '${gCfg.defOptions.importPath}';protobuf;\n`
+						: '';
+	const sproto_reference_content = gCfg.defOptions.nodejsMode
+						? `import * as p from '${path.relative(path.dirname(gCfg.defOptions.outTSFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
+						: '';
+	const sproto_namespace_head = !NullStr(gCfg.defOptions.rootNamespace)
+						? `${sproto_export}namespace ${gCfg.defOptions.rootNamespace} {\n`
+						: '';
+	const sproto_namespace_tail = !NullStr(gCfg.defOptions.rootNamespace) ? '}\n' : '';
+	const sproto_export_namespace = !NullStr(gCfg.defOptions.rootNamespace) || gCfg.defOptions.nodejsMode ? 'export ' : '';
+
+	const sproto_file_content = String.format(sproto_def_fmt,
+		sproto_import_content,
+		sproto_reference_content,
+		sproto_namespace_head,
+		sproto_IMsgMap,
+		sproto_SCHandlerMap,
+		sproto_HandlerMap,
+		sproto_namespace_tail,
+		sproto_export_namespace
+	);
+	return sproto_file_content;
+}
+
+async function gen_packageCmdFastMode_content(protoRoot: string, protoFileList: string[]): Promise<string> {
+	let package_def: PackageCmdModeDef = await generate_packageCmdMode_tables(protoRoot, protoFileList);
+	let sproto_IMsgMap = '';
+	let sproto_SCHandlerMap = '';
+	let sproto_HandlerMap = '';
+	const sproto_protobuf_import = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.importPath) ? 'p.' : '';
+	const fmt_sid = function(sysid: string, cmdid: string): string { return sprintf(gCfg.defOptions.packageCmdFmt, parseInt(sysid), parseInt(cmdid)); }
+	const fmt_id = function(sysid: string, cmdid: string): number { return parseInt(fmt_sid(sysid, cmdid)); }
+	const fmt_package = function(packageName: string, comment?: string):string { return `\t// ${packageName}\n${comment?'\t'+comment+'\n':''}`; }
+	const fmt_type_package = function(packageName: string, comment?: string):string { return `\t// ${packageName}\n${comment?'\t'+comment+'\n':''}\t${packageName}: {\n`; }
+	const fmt_message = function(sysid: string, cmdid: string, package_name: string, message_name: string, comment?: string): string {
+		return `${comment?'\t'+comment+'\n':''}\t'${fmt_sid(sysid, cmdid)}': ${sproto_protobuf_import}${package_name}.${message_name},\n`;
+	}
+	const fmt_type_message = function(sysid: string, cmdid: string, package_name: string, msgname: string, comment?: string): string {
+		return `${comment?'\t\t'+comment+'\n':''}\t\t${msgname}: <IHandler<'${fmt_sid(sysid, cmdid)}'>>{sid: '${fmt_sid(sysid, cmdid)}', id: ${fmt_id(sysid, cmdid)}, `
+					+ `pt: ${sproto_protobuf_import}${package_name}.${msgname} },\n`;
+	}
+
+
+	for (let package_id in package_def) {
+		const p_def = package_def[package_id];
+		sproto_IMsgMap += fmt_package(p_def.package_name/*, package_def[package_id].commemt*/);
+		sproto_SCHandlerMap += fmt_package(p_def.package_name/*, package_def[package_id].commemt*/);
+		sproto_HandlerMap += fmt_type_package(p_def.package_name, package_def[package_id].commemt);
+		for (let cmd_id in p_def.message_list) {
+			sproto_IMsgMap += fmt_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].imessage_name);
+			sproto_SCHandlerMap += fmt_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name);
+			sproto_HandlerMap += fmt_type_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name, p_def.message_list[cmd_id].comment);
+		}
+		sproto_HandlerMap += `\t},\n`;
 	}
 
 	const sproto_export = gCfg.defOptions.nodejsMode ? 'export ' : '';
