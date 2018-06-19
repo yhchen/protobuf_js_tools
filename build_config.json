@@ -41,7 +41,7 @@
             ],
         "GenMode": "PackageCmdFast",
         "packageCmdFmt": "0x%02x%02x",                  "-c02": "package cmd mode id format(for packageageCmdMode=true)",
-        "rootNamespace": "ProtoDef",                    "-c03": "root namespace for export file",
+        "rootModule": "puremvc",                        "-c03": "root module for export file",
         "nodejsMode": true,                             "-c04": "nodejs mode for `export`",
         "importPath": "protobufjs/minimal",             "-c05": "import protobuf file(only available for nodejsMode=true)",
         "outTSFile": "./test/def/proto_def.ts"
