@@ -24,7 +24,7 @@ if not "%errorlevel%" == "0" (
 
 echo ======================================================
 echo = check command pbjs
-call pbjs test\proto\Login.proto -t static > nul 2>nul
+call pbjs .\proto\Login.proto -t static > nul 2>nul
 if not "%errorlevel%" == "0" (
 	echo pbjs command not found! run install protobufjs...
 	call :ECHO_SPEED_UP_HELP

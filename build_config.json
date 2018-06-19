@@ -46,7 +46,7 @@
         "importPath": "protobufjs/minimal",             "-c05": "import protobuf file(only available for nodejsMode=true)",
         "outTSFile": "./test/def/proto_def.ts"
     },
-    "sourceRoot": "./test/proto/",
+    "sourceRoot": "./proto/",
     "outputFile": "./test/static-code/protobuf-static.js",
     "outputTSFile": "./test/static-code/protobuf-static.d.ts"
 }
