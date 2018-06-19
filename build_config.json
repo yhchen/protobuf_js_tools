@@ -10,7 +10,7 @@
                 "        static-module Static code without reflection as a module"
             ],
         "-t": "static-module",
-        "--keep-case": false,       "cmt02": "Keeps field casing instead of converting to camel case.",
+        "--keep-case": true,        "cmt02": "Keeps field casing instead of converting to camel case.",
         "--no-create": true,        "cmt03": "Does not generate create functions used for reflection compatibility.",
         "--no-encode": false,       "cmt04": "Does not generate encode functions.",
         "--no-decode": false,       "cmt05": "Does not generate decode functions.",
@@ -42,11 +42,11 @@
         "GenMode": "PackageCmdFast",
         "packageCmdFmt": "0x%02x%02x",                  "-c02": "package cmd mode id format(for packageageCmdMode=true)",
         "rootModule": "puremvc",                        "-c03": "root module for export file",
-        "nodejsMode": true,                             "-c04": "nodejs mode for `export`",
-        "importPath": "protobufjs/minimal",             "-c05": "import protobuf file(only available for nodejsMode=true)",
-        "outTSFile": "./test/def/proto_def.ts"
+        "nodejsMode": false,                            "-c04": "nodejs mode for `export`",
+        "importPath": "./protobuf.js",                  "-c05": "import protobuf file(only available for nodejsMode=true)",
+        "outTSFile": "../src/def/protobuf/NetProtoDef.ts"
     },
     "sourceRoot": "./proto/",
-    "outputFile": "./test/static-code/protobuf-static.js",
-    "outputTSFile": "./test/static-code/protobuf-static.d.ts"
+    "outputFile": "../src/def/protobuf/protobuf-static.js",
+    "outputTSFile": "../src/def/protobuf/protobuf-static.d.ts"
 }
