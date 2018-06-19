@@ -44,7 +44,7 @@
         "rootModule": "puremvc",                        "-c03": "root module for export file",
         "nodejsMode": false,                            "-c04": "nodejs mode for `export`",
         "importPath": "./protobuf.js",                  "-c05": "import protobuf file(only available for nodejsMode=true)",
-        "outTSFile": "../src/def/protobuf/NetProtoDef.ts"
+        "outTSFile": "../src/def/NetProtoDef.ts"
     },
     "sourceRoot": "./proto/",
     "outputFile": "../src/def/protobuf/protobuf-static.js",
