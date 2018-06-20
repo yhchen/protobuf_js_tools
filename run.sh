@@ -18,10 +18,8 @@ if [ ! $? -eq 0 ]; then
 	ECHO_SPEED_UP_HELP
 
 	npm install -g typescript
-	echo = typescript version is :`tsc -v`
-else
-	echo = typescript version is :`tsc -v`
 fi
+echo = typescript version is :`tsc -v`
 
 echo ======================================================
 echo = check command pbjs
@@ -44,13 +42,8 @@ fi
 
 if [ ! "$1" == "0" ]; then
 	echo ======================================================
-	echo = tsc compile
-	tsc -p .
-
-	echo ======================================================
 	echo = execute build proto
 	node ./bin/index.js
-	pause
 fi
 
 ECHO_SPEED_UP_HELP() {
