@@ -39,8 +39,10 @@ const _HandlerMap = {
 
 {8}function EncodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, proto: IMsgMap[T][T1]) : Uint8Array|undefined {
 	try {
-		let buffer: protobuf.Writer = _handler.pt.encode(proto);
-		return buffer.finish();
+		if (_handler.pt === null) {
+			return null;
+		}
+		return _handler.pt.encode(proto).finish();
 	} catch (ex) {
 		console.error(`Encode package_name:${_handler.p} message_name:${_handler.m} failure. error:${ex}`);
 	}
@@ -49,6 +51,9 @@ const _HandlerMap = {
 
 {8}function DecodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, buffer: Uint8Array) : IMsgMap[T][T1]|undefined {
 	try {
+		if (_handler.pt === null) {
+			return null;
+		}
 		return _handler.pt.decode(buffer);
 	} catch (ex) {
 		console.error(`Decode package_name:${_handler.p} message_name:${_handler.m} failure. error:${ex}`);
@@ -64,7 +69,10 @@ const _HandlerMap = {
 		return undefined;
 	}
 	const cmd_handler = package_handler[<string>message_id];
-	if (cmd_handler == null) {
+	if (cmd_handler === null) {
+		return null;
+	}
+	if (cmd_handler === undefined) {
 		console.error(`Encode Proto failure. proto type package_id:[${package_id}] message_id:${message_id}] not found.`);
 		return undefined;
 	}
@@ -84,9 +92,12 @@ const _HandlerMap = {
 		return undefined;
 	}
 	const cmd_handler = package_handler[<string>message_id];
-	if (cmd_handler == null) {
+	if (cmd_handler === undefined) {
 		console.error(`Decode Proto failure. proto type package_id:[${package_id}] message_id:${message_id}] not found.`);
 		return undefined;
+	}
+	if (cmd_handler === null) {
+		return null;
 	}
 	try {
 		return cmd_handler.decode(buffer);

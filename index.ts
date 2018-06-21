@@ -723,7 +723,7 @@ async function generate_EnumCmdMode_tables(protoRoot: string, protoFileList: str
 
 			line = line.substr(separete_idx+1);
 			let sComment: string = undefined;
-			let proto_name: string = undefined;
+			let proto_name: string = null;
 			const comment_idx = line.indexOf('//');
 			if (comment_idx > 0) {
 				sComment = line.substr(comment_idx);
