@@ -251,9 +251,10 @@ async function generate(_rootDir: string) {
 	pbtsResult = pbtsResult.replace(/\$protobuf/gi, 'protobuf');
 	if (!gCfg.defOptions.nodejsMode) {
 		pbtsResult = pbtsResult.replace(/export namespace/gi, 'declare namespace');
-		if (pbtsResult.indexOf('namespace') < 0) {
-			pbtsResult = pbtsResult.replace(/export class/g, 'declare class').replace(/export interface/g, 'interface');
-		}
+		// if (pbtsResult.indexOf('namespace') < 0) {
+		// 	pbtsResult = pbtsResult.replace(/export class/g, 'declare class').replace(/export interface/g, 'interface');
+		// }
+		pbtsResult = pbtsResult.replace(/export class/g, 'declare class').replace(/export interface/g, 'interface');
 	}
 	let tsOutFile = gCfg.outputTSFile ? path.join(_rootDir, gCfg.outputTSFile) : jsOutFile.substr(0, jsOutFile.lastIndexOf('.js')) + '.d.ts';
 	logger(`gen ts file :${green(tsOutFile)}`);
@@ -725,7 +726,7 @@ async function generate_EnumCmdMode_tables(protoRoot: string, protoFileList: str
 			let sComment: string = undefined;
 			let proto_name: string = null;
 			const comment_idx = line.indexOf('//');
-			if (comment_idx > 0) {
+			if (comment_idx >= 0) {
 				sComment = line.substr(comment_idx);
 				const proto_start_idx = sComment.indexOf('$') + 1;
 				if (proto_start_idx > 0) {
@@ -751,38 +752,34 @@ async function generate_EnumCmdMode_tables(protoRoot: string, protoFileList: str
 async function gen_EnumCmdMode_content(protoRoot: string, protoFileList: string[]): Promise<string> {
 	let package_def: EnumCmdModeDef = await generate_EnumCmdMode_tables(protoRoot, protoFileList);
 	let sproto_IMsgMap = '';
-	let sproto_IMsgMapSC = '';
 	let sproto_SCHandlerMap = '';
 	let sproto_HandlerMap = '';
 	const sproto_protobuf_import = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.importPath) ? 'p.' : '';
 	const fmt_package = function(pname: string, comment?: string):string { return `${comment?'\t'+comment+'\n':''}\t'${pname}': {\n`; }
 	const fmt_type_package = function(pname: string, comment?: string):string { return `${comment?'\t'+comment+'\n':''}\t${pname}: {\n`; }
 	const fmt_message = function(message_name: string, protoname: string, comment?: string): string {
-		return `${comment?'\t\t'+comment+'\n':''}\t\t'${message_name}': ${!protoname?'':sproto_protobuf_import}${protoname},\n`;
+		return `\t\t'${message_name}': ${!protoname?'':sproto_protobuf_import}${protoname},${comment?'\t'+comment:''}\n`;
 	}
 	const fmt_type_message = function(package_name: string, message_name: string, protoname: string, package_id: string, message_id: string, comment?: string): string {
-		return `${comment?'\t\t'+comment+'\n':''}\t\t${message_name}: <IHandler<'${package_name}', '${message_name}'>>`
+		return `\t\t${message_name}: <IHandler<'${package_name}', '${message_name}'>>`
 					+ `{p: '${package_name}', m: '${message_name}', sid: '${fmt_sid(package_id, message_id)}', `
-					+ `mid: ${fmt_id(package_id, message_id)}, pt: ${!protoname?'':sproto_protobuf_import}${protoname} },\n`;
+					+ `mid: ${fmt_id(package_id, message_id)}, pt: ${!protoname?'':sproto_protobuf_import}${protoname} },${comment?'\t'+comment:''}\n`;
 	}
 
 	for (let package_name in package_def) {
 		const p_def = package_def[package_name];
 		sproto_IMsgMap += fmt_package(package_name, p_def.comment);
-		sproto_IMsgMapSC += fmt_package(p_def.package_id.toString(), p_def.comment);
 		sproto_SCHandlerMap += fmt_package(p_def.package_id.toString(), p_def.comment);
 		sproto_HandlerMap += fmt_type_package(package_name, p_def.comment);
 		for (let iter of p_def.message_list) {
 			const message_name = iter[0];
 			const m_def = iter[1];
 			sproto_IMsgMap += fmt_message(message_name, m_def.proto, m_def.comment);
-			sproto_IMsgMapSC += fmt_message(m_def.id.toString(), m_def.proto, m_def.comment);
 			sproto_SCHandlerMap += fmt_message(m_def.id.toString(), m_def.proto, m_def.comment);
 
 			sproto_HandlerMap += fmt_type_message(package_name, message_name, m_def.proto, p_def.package_id.toString(), m_def.id.toString(), m_def.comment);
 		}
 		sproto_IMsgMap += '\t},\n';
-		sproto_IMsgMapSC += '\t},\n';
 		sproto_SCHandlerMap += '\t},\n';
 		sproto_HandlerMap += '\t},\n';
 	}
@@ -805,7 +802,7 @@ async function gen_EnumCmdMode_content(protoRoot: string, protoFileList: string[
 		sproto_reference_content,
 		sproto_module_head,
 		sproto_IMsgMap,
-		sproto_IMsgMapSC,
+		'',//{4} is empty
 		sproto_SCHandlerMap,
 		sproto_HandlerMap,
 		sproto_module_tail,

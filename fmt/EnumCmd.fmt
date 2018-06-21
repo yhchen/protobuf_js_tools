@@ -14,16 +14,13 @@ type _DeepReadonly<T> = {
 {3}
 };
 
-{8}type IMsgMapSC = {
-{4}
-};
-
 
 //Proto Msg Handler
 const _SCHandlerMap = {
 {5}
 };
 {8}const SCHandlerMap = _SCHandlerMap as _DeepReadonly<typeof _SCHandlerMap>;
+{8}type TSCHandlerMap = typeof SCHandlerMap;
 
 {8}interface IHandler<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]> {
 	readonly p: T;//		package_name(string)
@@ -62,13 +59,13 @@ const _HandlerMap = {
 }
 
 
-{8}function EncodeSC<T extends keyof IMsgMapSC, T1 extends keyof IMsgMapSC[T]>(package_id: T, message_id: T1, proto: IMsgMapSC[T][T1]) : Uint8Array|undefined {
+{8}function EncodeSC<T extends keyof TSCHandlerMap, T1 extends keyof TSCHandlerMap[T]>(package_id: T, message_id: T1, proto: TSCHandlerMap[T][T1]) : Uint8Array|undefined {
 	const package_handler = SCHandlerMap[package_id];
 	if (package_handler == null) {
 		console.error(`Encode Proto failure. package type package_id:[${package_id}] message_id:${message_id}] not found.`);
 		return undefined;
 	}
-	const cmd_handler = package_handler[<string>message_id];
+	const cmd_handler = package_handler[message_id];
 	if (cmd_handler === null) {
 		return null;
 	}
@@ -77,7 +74,7 @@ const _HandlerMap = {
 		return undefined;
 	}
 	try {
-		let buffer: protobuf.Writer = cmd_handler.encode(proto);
+		let buffer: protobuf.Writer = (<any>cmd_handler).encode(proto);
 		return buffer.finish();
 	} catch (ex) {
 		console.error(`Encode package_id:${package_id} message_id:${message_id} failure. error:${ex}`);
@@ -85,13 +82,13 @@ const _HandlerMap = {
 	return undefined;
 }
 
-{8}function DecodeSC<T extends keyof IMsgMapSC, T1 extends keyof IMsgMapSC[T]>(package_id: T, message_id: T1, buffer: Uint8Array) : IMsgMapSC[T][T1]|undefined {
+{8}function DecodeSC<T extends keyof TSCHandlerMap, T1 extends keyof TSCHandlerMap[T]>(package_id: T, message_id: T1, buffer: Uint8Array) : TSCHandlerMap[T][T1]|undefined {
 	const package_handler = SCHandlerMap[package_id];
 	if (package_handler == null) {
 		console.error(`Decode Proto failure. package type package_id:[${package_id}] message_id:${message_id}] not found.`);
 		return undefined;
 	}
-	const cmd_handler = package_handler[<string>message_id];
+	const cmd_handler = package_handler[message_id];
 	if (cmd_handler === undefined) {
 		console.error(`Decode Proto failure. proto type package_id:[${package_id}] message_id:${message_id}] not found.`);
 		return undefined;
@@ -100,7 +97,7 @@ const _HandlerMap = {
 		return null;
 	}
 	try {
-		return cmd_handler.decode(buffer);
+		return (<any>cmd_handler).decode(buffer);
 	} catch (ex) {
 		console.error(`Decode package_id:${package_id} message_id:${message_id} failure. error:${ex}`);
 	}
