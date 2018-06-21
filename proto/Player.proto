@@ -1,6 +1,13 @@
 // Player Package
 package Player; //$2
 
+// enum EMessageDef //$Player:2
+// {
+// 	sInfo = 1; //server response Player Info $Player.Info
+// 	sTest = 2; //server test response $Player.Test
+// 	sTestNoProto = 3; //server test response
+// }
+
 message Info //$1
 {
     required int32 uid = 1;

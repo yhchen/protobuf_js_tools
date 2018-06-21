@@ -1,6 +1,14 @@
 // Login package
 package Login; //$1
 
+enum EMessageDef //$Login:1
+{
+	// message id can not be repeated!
+	cLoginReq = 1; //client request login $Login.LoginReq
+
+	sLoginRsp = 2; //server response login $Login.LoginRsp
+}
+
 // login request proto
 message LoginReq //$1
 {
