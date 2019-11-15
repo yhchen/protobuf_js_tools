@@ -48,7 +48,12 @@ if not "%1" == "0" (
 
 	echo ======================================================
 	echo = execute build proto
-	call node ./bin/index.js
+
+	SET SOURCE_DIR = %2
+	SET JS_OUT_DIR = %3
+	SET TS_OUT_DIR = %4
+
+	call node ./bin/index.js "%SOURCE_DIR%" "%JS_OUT_DIR%" "%TS_OUT_DIR%"
 	pause
 )
 GOTO :EOF

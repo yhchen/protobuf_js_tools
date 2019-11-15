@@ -13,7 +13,9 @@
                 "${workspaceRoot}/**/*.js"
             ],
             "console": "integratedTerminal",
-            "preLaunchTask": "shell"
+            "preLaunchTask": "shell",
+            "args": [
+            ]
         }
     ]
 }

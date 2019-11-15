@@ -57,8 +57,9 @@ function exception(fmt:string, ...args:any[]): void {
 }
 
 
-logger(`__dirname   :${green(__dirname)}`);
-const rootDir = path.resolve(__dirname, '../');// for bin dir
+logger(`Current Run Posotion   :${green(process.cwd())}`);
+const rootDir = path.resolve(process.cwd());
+const execDir = path.resolve(path.dirname(__dirname)); // out bin folder
 logger(`root dir    :${green(rootDir)}`);
 
 // 执行指令
@@ -146,7 +147,7 @@ type ProtobufConfig = {
 }
 
 
-const config_file_path = './build_config.json'
+const config_file_path = path.join(execDir, './build_config.json');
 
 // load config file
 {
@@ -161,7 +162,7 @@ const config_file_path = './build_config.json'
 
 // load fmt file
 {
-	let fmt_file_path: string = `./fmt/${gCfg.defOptions.GenMode}.fmt`;
+	let fmt_file_path = path.join(execDir, `./fmt/${gCfg.defOptions.GenMode}.fmt`);
 	if (!fs.existsSync(fmt_file_path)) {
 		exception(`fmt file ${fmt_file_path} not found`);
 	}
@@ -185,8 +186,12 @@ function format_size(size: number): string {
 	return `${Math.round(size/(1024*1024)*100)/100}MB`;
 }
 
-async function generate(_rootDir: string) {
+async function generate(_rootDir: string, sourceDir?: string, outJsDir?: string, outTsDir?: string) {
 	// init
+	if (sourceDir) gCfg.sourceRoot = sourceDir;
+	if (outJsDir) gCfg.outputFile = outJsDir;
+	if (outTsDir) gCfg.outputTSFile = outTsDir;
+
 	const tempfile = path.join(os.tmpdir(), 'build_proto', 'tmp_' + Date.now() + '.js');
 	await fs.mkdirpAsync(path.dirname(tempfile));
 	const jsOutFile = path.join(_rootDir, gCfg.outputFile);
@@ -812,4 +817,4 @@ async function gen_EnumCmdMode_content(protoRoot: string, protoFileList: string[
 }
 
 // main entry
-generate(rootDir);
+generate(rootDir, process.argv[2], process.argv[3], process.argv[4]);
