@@ -76,7 +76,7 @@ modify `build_config.json` options
         "rootModule": string,        "-c03": "root module for export file",
         "nodejsMode": boolean,          "-c04": "nodejs mode for `export`",
         "importPath"?: string,          "-c05": "import protobuf file(for nodejs)",
-        "outTSFile": string
+        "outTSDefFile": string
     },
     "sourceRoot": string,
     "outputFile": string,

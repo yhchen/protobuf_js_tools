@@ -146,7 +146,7 @@ type ProtobufConfig = {
         "rootModule": string,        "-c03": "root module for export file",
         "nodejsMode": boolean,          "-c04": "nodejs mode for `export`",
         "importPath"?: string,          "-c05": "import protobuf file(for nodejs)",
-        "outTSFile": string
+        "outTSDefFile": string
     },
     "sourceRoot": string,
     "outputFile": string,
@@ -193,11 +193,12 @@ function format_size(size: number): string {
 	return `${Math.round(size/(1024*1024)*100)/100}MB`;
 }
 
-async function generate(_rootDir: string, sourceDir?: string, outJsDir?: string, outTsDir?: string) {
+async function generate(_rootDir: string, sourceFile?: string, outJsFile?: string, outTsFile?: string, outTsDefFile?: string) {
 	// init
-	if (sourceDir) gCfg.sourceRoot = sourceDir;
-	if (outJsDir) gCfg.outputFile = outJsDir;
-	if (outTsDir) gCfg.outputTSFile = outTsDir;
+	if (sourceFile) gCfg.sourceRoot = sourceFile;
+	if (outJsFile) gCfg.outputFile = outJsFile;
+	if (outTsFile) gCfg.outputTSFile = outTsFile;
+	if (outTsDefFile) gCfg.defOptions.outTSDefFile = outTsDefFile;
 
 	const tempfile = path.join(os.tmpdir(), 'build_proto', 'tmp_' + Date.now() + '.js');
 	await fs.mkdirpAsync(path.dirname(tempfile));
@@ -275,7 +276,7 @@ async function generate(_rootDir: string, sourceDir?: string, outJsDir?: string,
 	await fs.writeFileAsync(tsOutFile, pbtsResult, 'utf-8');
 	await fs.removeAsync(tempfile);
 	// gen encode decode and type check code & save file
-	if (!NullStr(gCfg.defOptions.outTSFile))
+	if (!NullStr(gCfg.defOptions.outTSDefFile))
 	{
 		let sproto_file_content = null;
 		switch (gCfg.defOptions.GenMode)
@@ -293,7 +294,7 @@ async function generate(_rootDir: string, sourceDir?: string, outJsDir?: string,
 			sproto_file_content = await gen_EnumCmdMode_content(protoRoot, protoList);
 			break;
 		}
-		const tsCodeFilePath = JoinPath(_rootDir, gCfg.defOptions.outTSFile);
+		const tsCodeFilePath = JoinPath(_rootDir, gCfg.defOptions.outTSDefFile);
 		await fs.mkdirpAsync(path.dirname(tsCodeFilePath));
 		await fs.writeFileAsync(tsCodeFilePath, sproto_file_content, {encoding:'utf-8', flag:'w+'});
 		logger(`gen ts file :${green(tsCodeFilePath)}`);
@@ -429,7 +430,7 @@ async function gen_packageCmdMode_content(protoRoot: string, protoFileList: stri
 						? `import * as protobuf from '${gCfg.defOptions.importPath}';protobuf;\n`
 						: '';
 	const sproto_reference_content = gCfg.defOptions.nodejsMode
-						? `import * as p from '${path.relative(path.dirname(gCfg.defOptions.outTSFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
+						? `import * as p from '${path.relative(path.dirname(gCfg.defOptions.outTSDefFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
 						: '';
 	const sproto_module_head = !NullStr(gCfg.defOptions.rootModule)
 						? `${sproto_export}module ${gCfg.defOptions.rootModule} {\n`
@@ -485,7 +486,7 @@ async function gen_packageCmdFastMode_content(protoRoot: string, protoFileList: 
 						? `import * as protobuf from '${gCfg.defOptions.importPath}';protobuf;\n`
 						: '';
 	const sproto_reference_content = gCfg.defOptions.nodejsMode
-						? `import * as p from '${path.relative(path.dirname(gCfg.defOptions.outTSFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
+						? `import * as p from '${path.relative(path.dirname(gCfg.defOptions.outTSDefFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
 						: '';
 	const sproto_module_head = !NullStr(gCfg.defOptions.rootModule)
 						? `${sproto_export}module ${gCfg.defOptions.rootModule} {\n`
@@ -615,7 +616,7 @@ async function gen_NormalMode_content(protoRoot: string, protoFileList: string[]
 						? `import * as protobuf from '${gCfg.defOptions.importPath}';protobuf;\n`
 						: '';
 	const sproto_reference_content = gCfg.defOptions.nodejsMode
-						? `import * as p from '${path.relative(path.dirname(gCfg.defOptions.outTSFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
+						? `import * as p from '${path.relative(path.dirname(gCfg.defOptions.outTSDefFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
 						: '';
 	const sproto_module_head = !NullStr(gCfg.defOptions.rootModule)
 						? `${sproto_export}module ${gCfg.defOptions.rootModule} {\n`
@@ -801,7 +802,7 @@ async function gen_EnumCmdMode_content(protoRoot: string, protoFileList: string[
 						? `import * as protobuf from '${gCfg.defOptions.importPath}';protobuf;\n`
 						: '';
 	const sproto_reference_content = gCfg.defOptions.nodejsMode
-						? `import * as p from '${path.relative(path.dirname(gCfg.defOptions.outTSFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
+						? `import * as p from '${path.relative(path.dirname(gCfg.defOptions.outTSDefFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
 						: '';
 	const sproto_module_head = !NullStr(gCfg.defOptions.rootModule)
 						? `${sproto_export}module ${gCfg.defOptions.rootModule} {\n`
@@ -824,4 +825,4 @@ async function gen_EnumCmdMode_content(protoRoot: string, protoFileList: string[
 }
 
 // main entry
-generate(rootDir, process.argv[2], process.argv[3], process.argv[4]);
+generate(rootDir, process.argv[2], process.argv[3], process.argv[4], process.argv[5]);

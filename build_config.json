@@ -59,7 +59,7 @@
         "rootModule": "puremvc",                        "-c03": "root module for export file",
         "nodejsMode": true,                             "-c04": "nodejs mode for `export`",
         "importPath": "protobufjs/minimal",             "-c05": "import protobuf file(only available for nodejsMode=true)",
-        "outTSFile": "./test/def/proto_def.ts"
+        "outTSDefFile": "./test/def/proto_def.ts"
     },
     "sourceRoot": "./proto/",
     "outputFile": "./test/static-code/protobuf-static.js",

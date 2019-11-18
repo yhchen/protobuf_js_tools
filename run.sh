@@ -44,11 +44,12 @@ if [ ! "$1" == "0" ]; then
 	echo ======================================================
 	echo = execute build proto
 
-	SOURCE_DIR = $2
-	JS_OUT_DIR = $3
-	TS_OUT_DIR = $4
+	SOURCE_DIR = $1
+	JS_OUT_DIR = $2
+	TS_OUT_DIR = $3
+	TS_DEF_OUT_DIR = $4
 
-	node ./bin/index.js "${SOURCE_DIR}" "${JS_OUT_DIR}" "${TS_OUT_DIR}"
+	node ./bin/index.js "${SOURCE_DIR}" "${JS_OUT_DIR}" "${TS_OUT_DIR}" "${TS_DEF_OUT_DIR}"
 fi
 
 ECHO_SPEED_UP_HELP() {
