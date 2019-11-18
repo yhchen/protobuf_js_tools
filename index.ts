@@ -52,6 +52,12 @@ function JoinPath(s1: string, s2: string, s3?: string) {
 	return s3 ? path.join(s1, s2, s3) : path.join(s1, s2);
 }
 
+function RelativePath(from: string, to: string) {
+	let p = path.relative(from, to).replace(/\\/g, '/').replace(/\/\//g, '/');
+	if (p.indexOf('/') < 0) p = './' + p;
+	return p;
+}
+
 const green = chalk.greenBright;
 const yellow = chalk.yellowBright.underline;
 const whiteBright = chalk.whiteBright;
@@ -144,7 +150,7 @@ type ProtobufConfig = {
         "GenMode": string,
         "packageCmdFmt": string,        "-c02": "package cmd mode id format(for packageageCmdMode=true)",
         "rootModule": string,        "-c03": "root module for export file",
-        "nodejsMode": boolean,          "-c04": "nodejs mode for `export`",
+        "nodeMode": boolean,          "-c04": "nodejs mode for `export`",
         "importPath"?: string,          "-c05": "import protobuf file(for nodejs)",
         "outTSDefFile": string
     },
@@ -239,7 +245,7 @@ async function generate(_rootDir: string, sourceFile?: string, outJsFile?: strin
 	}
 	await shell('pbjs', args);
 	let pbjsResult = await fs.readFileAsync(tempfile, 'utf-8');
-	if (!gCfg.defOptions.nodejsMode) {
+	if (!gCfg.defOptions.nodeMode) {
 		pbjsResult = `var $protobuf = window.protobuf;\n$protobuf.roots.default=window;\n` + pbjsResult;
 	} else {
 		// pbjsResult = `var $protobuf = require('protobufjs');\n` + pbjsResult;
@@ -257,12 +263,12 @@ async function generate(_rootDir: string, sourceFile?: string, outJsFile?: strin
 	// gen .d.ts file
 	await shell('pbts', ['--main', jsOutFile, '-o', tempfile]);
 	let pbtsResult = await fs.readFileAsync(tempfile, 'utf-8');
-	if (gCfg.defOptions.nodejsMode) {
+	if (gCfg.defOptions.nodeMode) {
 		pbtsResult = `/// <reference types='protobufjs' />';\n\n` + pbtsResult;
 	}
 	pbtsResult = pbtsResult.replace(/: Long;/gi, ': protobuf.Long;').replace(/(number\|Long)/gi, '(number|protobuf.Long)');
 	pbtsResult = pbtsResult.replace(/\$protobuf/gi, 'protobuf');
-	if (!gCfg.defOptions.nodejsMode) {
+	if (!gCfg.defOptions.nodeMode) {
 		pbtsResult = pbtsResult.replace(/export namespace/gi, 'declare namespace');
 		// if (pbtsResult.indexOf('namespace') < 0) {
 		// 	pbtsResult = pbtsResult.replace(/export class/g, 'declare class').replace(/export interface/g, 'interface');
@@ -398,7 +404,7 @@ async function gen_packageCmdMode_content(protoRoot: string, protoFileList: stri
 	let sproto_IMsgMap = '';
 	let sproto_SCHandlerMap = '';
 	let sproto_HandlerMap = '';
-	const sproto_protobuf_import = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.importPath) ? 'p.' : '';
+	const sproto_protobuf_import = gCfg.defOptions.nodeMode && !NullStr(gCfg.defOptions.importPath) ? 'p.' : '';
 	const fmt_package = function(sysid: string, comment?: string):string { return `${comment?'\t'+comment+'\n':''}\t'${sysid}': {\n`; }
 	const fmt_type_package = function(sysid: string, comment?: string):string { return `${comment?'\t'+comment+'\n':''}\t${sysid}: {\n`; }
 	const fmt_message = function(cmdid: string, package_name: string, message_name: string, comment?: string): string {
@@ -425,18 +431,18 @@ async function gen_packageCmdMode_content(protoRoot: string, protoFileList: stri
 		sproto_HandlerMap += '\t},\n';
 	}
 
-	const sproto_export = gCfg.defOptions.nodejsMode ? 'export ' : '';
-	const sproto_import_content = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.importPath)
+	const sproto_export = gCfg.defOptions.nodeMode ? 'export ' : '';
+	const sproto_import_content = gCfg.defOptions.nodeMode && !NullStr(gCfg.defOptions.importPath)
 						? `import * as protobuf from '${gCfg.defOptions.importPath}';protobuf;\n`
 						: '';
-	const sproto_reference_content = gCfg.defOptions.nodejsMode
-						? `import * as p from '${path.relative(path.dirname(gCfg.defOptions.outTSDefFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
+	const sproto_reference_content = gCfg.defOptions.nodeMode
+						? `import * as p from '${RelativePath(path.dirname(gCfg.defOptions.outTSDefFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
 						: '';
 	const sproto_module_head = !NullStr(gCfg.defOptions.rootModule)
 						? `${sproto_export}module ${gCfg.defOptions.rootModule} {\n`
 						: '';
 	const sproto_module_tail = !NullStr(gCfg.defOptions.rootModule) ? '}\n' : '';
-	const sproto_export_module = !NullStr(gCfg.defOptions.rootModule) || gCfg.defOptions.nodejsMode ? 'export ' : '';
+	const sproto_export_module = !NullStr(gCfg.defOptions.rootModule) || gCfg.defOptions.nodeMode ? 'export ' : '';
 
 	const sproto_file_content = String.format(sproto_def_fmt,
 		sproto_import_content,
@@ -456,7 +462,7 @@ async function gen_packageCmdFastMode_content(protoRoot: string, protoFileList: 
 	let sproto_IMsgMap = '';
 	let sproto_SCHandlerMap = '';
 	let sproto_HandlerMap = '';
-	const sproto_protobuf_import = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.importPath) ? 'p.' : '';
+	const sproto_protobuf_import = gCfg.defOptions.nodeMode && !NullStr(gCfg.defOptions.importPath) ? 'p.' : '';
 	const fmt_package = function(packageName: string, comment?: string):string { return `\t// ${packageName}\n${comment?'\t'+comment+'\n':''}`; }
 	const fmt_type_package = function(packageName: string, comment?: string):string { return `\t// ${packageName}\n${comment?'\t'+comment+'\n':''}\t${packageName}: {\n`; }
 	const fmt_message = function(sysid: string, cmdid: string, package_name: string, message_name: string, comment?: string): string {
@@ -481,18 +487,18 @@ async function gen_packageCmdFastMode_content(protoRoot: string, protoFileList: 
 		sproto_HandlerMap += `\t},\n`;
 	}
 
-	const sproto_export = gCfg.defOptions.nodejsMode ? 'export ' : '';
-	const sproto_import_content = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.importPath)
+	const sproto_export = gCfg.defOptions.nodeMode ? 'export ' : '';
+	const sproto_import_content = gCfg.defOptions.nodeMode && !NullStr(gCfg.defOptions.importPath)
 						? `import * as protobuf from '${gCfg.defOptions.importPath}';protobuf;\n`
 						: '';
-	const sproto_reference_content = gCfg.defOptions.nodejsMode
-						? `import * as p from '${path.relative(path.dirname(gCfg.defOptions.outTSDefFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
+	const sproto_reference_content = gCfg.defOptions.nodeMode
+						? `import * as p from '${RelativePath(path.dirname(gCfg.defOptions.outTSDefFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
 						: '';
 	const sproto_module_head = !NullStr(gCfg.defOptions.rootModule)
 						? `${sproto_export}module ${gCfg.defOptions.rootModule} {\n`
 						: '';
 	const sproto_module_tail = !NullStr(gCfg.defOptions.rootModule) ? '}\n' : '';
-	const sproto_export_module = !NullStr(gCfg.defOptions.rootModule) || gCfg.defOptions.nodejsMode ? 'export ' : '';
+	const sproto_export_module = !NullStr(gCfg.defOptions.rootModule) || gCfg.defOptions.nodeMode ? 'export ' : '';
 
 	const sproto_file_content = String.format(sproto_def_fmt,
 		sproto_import_content,
@@ -579,7 +585,7 @@ async function generate_NormalMode_tables(protoRoot: string, protoFileList: stri
 
 async function gen_NormalMode_content(protoRoot: string, protoFileList: string[]): Promise<string> {
 	let package_def = await generate_NormalMode_tables(protoRoot, protoFileList);
-	const sproto_protobuf_import = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.importPath) ? 'p.' : '';
+	const sproto_protobuf_import = gCfg.defOptions.nodeMode && !NullStr(gCfg.defOptions.importPath) ? 'p.' : '';
 	let sproto_INotifyType = '';
 	let sproto_NotifyType = '';
 
@@ -611,12 +617,12 @@ async function gen_NormalMode_content(protoRoot: string, protoFileList: string[]
 		}
 	}
 
-	const sproto_export = gCfg.defOptions.nodejsMode ? 'export ' : '';
-	const sproto_import_content = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.importPath)
+	const sproto_export = gCfg.defOptions.nodeMode ? 'export ' : '';
+	const sproto_import_content = gCfg.defOptions.nodeMode && !NullStr(gCfg.defOptions.importPath)
 						? `import * as protobuf from '${gCfg.defOptions.importPath}';protobuf;\n`
 						: '';
-	const sproto_reference_content = gCfg.defOptions.nodejsMode
-						? `import * as p from '${path.relative(path.dirname(gCfg.defOptions.outTSDefFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
+	const sproto_reference_content = gCfg.defOptions.nodeMode
+						? `import * as p from '${RelativePath(path.dirname(gCfg.defOptions.outTSDefFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
 						: '';
 	const sproto_module_head = !NullStr(gCfg.defOptions.rootModule)
 						? `${sproto_export}module ${gCfg.defOptions.rootModule} {\n`
@@ -767,7 +773,7 @@ async function gen_EnumCmdMode_content(protoRoot: string, protoFileList: string[
 	let sproto_IMsgMap = '';
 	let sproto_SCHandlerMap = '';
 	let sproto_HandlerMap = '';
-	const sproto_protobuf_import = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.importPath) ? 'p.' : '';
+	const sproto_protobuf_import = gCfg.defOptions.nodeMode && !NullStr(gCfg.defOptions.importPath) ? 'p.' : '';
 	const fmt_package = function(pname: string, comment?: string):string { return `${comment?'\t'+comment+'\n':''}\t'${pname}': {\n`; }
 	const fmt_type_package = function(pname: string, comment?: string):string { return `${comment?'\t'+comment+'\n':''}\t${pname}: {\n`; }
 	const fmt_message = function(message_name: string, protoname: string, comment?: string): string {
@@ -797,18 +803,18 @@ async function gen_EnumCmdMode_content(protoRoot: string, protoFileList: string[
 		sproto_HandlerMap += '\t},\n';
 	}
 
-	const sproto_export = gCfg.defOptions.nodejsMode ? 'export ' : '';
-	const sproto_import_content = gCfg.defOptions.nodejsMode && !NullStr(gCfg.defOptions.importPath)
+	const sproto_export = gCfg.defOptions.nodeMode ? 'export ' : '';
+	const sproto_import_content = gCfg.defOptions.nodeMode && !NullStr(gCfg.defOptions.importPath)
 						? `import * as protobuf from '${gCfg.defOptions.importPath}';protobuf;\n`
 						: '';
-	const sproto_reference_content = gCfg.defOptions.nodejsMode
-						? `import * as p from '${path.relative(path.dirname(gCfg.defOptions.outTSDefFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
+	const sproto_reference_content = gCfg.defOptions.nodeMode
+						? `import * as p from '${RelativePath(path.dirname(gCfg.defOptions.outTSDefFile), gCfg.outputFile).replace(/\\/g, '/')}';\n`
 						: '';
 	const sproto_module_head = !NullStr(gCfg.defOptions.rootModule)
 						? `${sproto_export}module ${gCfg.defOptions.rootModule} {\n`
 						: '';
 	const sproto_module_tail = !NullStr(gCfg.defOptions.rootModule) ? '}\n' : '';
-	const sproto_export_module = !NullStr(gCfg.defOptions.rootModule) || gCfg.defOptions.nodejsMode ? 'export ' : '';
+	const sproto_export_module = !NullStr(gCfg.defOptions.rootModule) || gCfg.defOptions.nodeMode ? 'export ' : '';
 
 	const sproto_file_content = String.format(sproto_def_fmt,
 		sproto_import_content,
