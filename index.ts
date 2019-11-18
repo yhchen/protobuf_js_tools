@@ -483,10 +483,10 @@ async function gen_packageCmdFastMode_content(protoRoot: string, protoFileList: 
 	const fmt_package = function(packageName: string, comment?: string):string { return `\t// ${packageName}\n${comment?'\t'+comment+'\n':''}`; }
 	const fmt_type_package = function(packageName: string, comment?: string):string { return `\t// ${packageName}\n${comment?'\t'+comment+'\n':''}\t${packageName}: {\n`; }
 	const fmt_message = function(sysid: string, cmdid: string, package_name: string, message_name: string, comment?: string): string {
-		return `${comment?'\t'+comment+'\n':''}\t'${fmt_sid(sysid, cmdid)}': ${sproto_protobuf_import}${package_name}.${message_name},\n`;
+		return `${comment?'\t'+comment+'\n':''}\t${fmt_sid(sysid, cmdid)}: ${sproto_protobuf_import}${package_name}.${message_name},\n`;
 	}
 	const fmt_type_message = function(sysid: string, cmdid: string, package_name: string, msgname: string, comment?: string): string {
-		return `${comment?'\t\t'+comment+'\n':''}\t\t${msgname}: <IHandler<'${fmt_sid(sysid, cmdid)}'>>{sid: '${fmt_sid(sysid, cmdid)}', id: ${fmt_id(sysid, cmdid)}, `
+		return `${comment?'\t\t'+comment+'\n':''}\t\t${msgname}: <IHandler<${fmt_sid(sysid, cmdid)}>>{sid: ${fmt_sid(sysid, cmdid)}, id: ${fmt_id(sysid, cmdid)}, `
 					+ `pt: ${sproto_protobuf_import}${package_name}.${msgname} },\n`;
 	}
 
@@ -804,7 +804,7 @@ async function gen_EnumCmdMode_content(protoRoot: string, protoFileList: string[
 	}
 	const fmt_type_message = function(package_name: string, message_name: string, protoname: string, package_id: string, message_id: string, comment?: string): string {
 		return `\t\t${message_name}: <IHandler<'${package_name}', '${message_name}'>>`
-					+ `{p: '${package_name}', m: '${message_name}', sid: '${fmt_sid(package_id, message_id)}', `
+					+ `{p: '${package_name}', m: '${message_name}', sid: ${fmt_sid(package_id, message_id)}, `
 					+ `mid: ${fmt_id(package_id, message_id)}, pt: ${!protoname?'':sproto_protobuf_import}${protoname} },${comment?'\t'+comment:''}\n`;
 	}
 
