@@ -49,7 +49,7 @@ function JoinPath(s1: string, s2: string, s3?: string) {
 	if (path.isAbsolute(s2)) {
 		return s3 ? path.join(s2, s3) : s2;
 	}
-	return path.join(s1, s2, s3);
+	return s3 ? path.join(s1, s2, s3) : path.join(s1, s2);
 }
 
 const green = chalk.greenBright;
