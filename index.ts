@@ -45,6 +45,13 @@ function FindWords(s: string, otherIncludeWords?: string, start?:number): number
 	return s.length;
 }
 
+function JoinPath(s1: string, s2: string, s3?: string) {
+	if (path.isAbsolute(s2)) {
+		return s3 ? path.join(s2, s3) : s2;
+	}
+	return path.join(s1, s2, s3);
+}
+
 const green = chalk.greenBright;
 const yellow = chalk.yellowBright.underline;
 const whiteBright = chalk.whiteBright;
@@ -194,10 +201,10 @@ async function generate(_rootDir: string, sourceDir?: string, outJsDir?: string,
 
 	const tempfile = path.join(os.tmpdir(), 'build_proto', 'tmp_' + Date.now() + '.js');
 	await fs.mkdirpAsync(path.dirname(tempfile));
-	const jsOutFile = path.join(_rootDir, gCfg.outputFile);
+	const jsOutFile = JoinPath(_rootDir, gCfg.outputFile);
 	const dirname = path.dirname(jsOutFile);
 	await fs.mkdirpAsync(dirname);
-	const protoRoot = path.join(_rootDir, gCfg.sourceRoot);
+	const protoRoot = JoinPath(_rootDir, gCfg.sourceRoot);
 	logger(`proto dir   :${green(protoRoot)}`);
 	// find *.proto files
 	const fileList = await fs.readdirAsync(protoRoot);
@@ -261,7 +268,7 @@ async function generate(_rootDir: string, sourceDir?: string, outJsDir?: string,
 		// }
 		pbtsResult = pbtsResult.replace(/export class/g, 'declare class').replace(/export interface/g, 'interface');
 	}
-	let tsOutFile = gCfg.outputTSFile ? path.join(_rootDir, gCfg.outputTSFile) : jsOutFile.substr(0, jsOutFile.lastIndexOf('.js')) + '.d.ts';
+	let tsOutFile = gCfg.outputTSFile ? JoinPath(_rootDir, gCfg.outputTSFile) : jsOutFile.substr(0, jsOutFile.lastIndexOf('.js')) + '.d.ts';
 	logger(`gen ts file :${green(tsOutFile)}`);
 	logger(`file size   :${yellow(format_size(pbtsResult.length))}`);
 	await fs.mkdirpAsync(path.dirname(tsOutFile));
@@ -286,7 +293,7 @@ async function generate(_rootDir: string, sourceDir?: string, outJsDir?: string,
 			sproto_file_content = await gen_EnumCmdMode_content(protoRoot, protoList);
 			break;
 		}
-		const tsCodeFilePath = path.join(_rootDir, gCfg.defOptions.outTSFile);
+		const tsCodeFilePath = JoinPath(_rootDir, gCfg.defOptions.outTSFile);
 		await fs.mkdirpAsync(path.dirname(tsCodeFilePath));
 		await fs.writeFileAsync(tsCodeFilePath, sproto_file_content, {encoding:'utf-8', flag:'w+'});
 		logger(`gen ts file :${green(tsCodeFilePath)}`);
