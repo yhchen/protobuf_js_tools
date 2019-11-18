@@ -45,10 +45,10 @@ function FindWords(s: string, otherIncludeWords?: string, start?:number): number
 	return s.length;
 }
 
-const green = chalk.default.greenBright;
-const yellow = chalk.default.yellowBright.underline;
-const whiteBright = chalk.default.whiteBright;
-const redBright = chalk.default.redBright;
+const green = chalk.greenBright;
+const yellow = chalk.yellowBright.underline;
+const whiteBright = chalk.whiteBright;
+const redBright = chalk.redBright;
 const logger = console.log;
 function exception(fmt:string, ...args:any[]): void {
 	const message = String.format(fmt, ...args);
