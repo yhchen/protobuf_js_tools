@@ -38,7 +38,16 @@ modify `build_config.json` options
         "--no-comments"?: boolean,  "cmt10": "Does not output any JSDoc comments.",
         "--force-long"?: boolean,   "cmt11": "Enfores the use of 'Long' for s-/u-/int64 and s-/fixed64 fields.",
         "--force-number"?: boolean, "cmt12": "Enfores the use of 'number' for s-/u-/int64 and s-/fixed64 fields.",
-        "--force-message"?: boolean,"cmt13": "Enfores the use of message instances instead of plain objects"
+        "--force-message"?: boolean,"cmt13": "Enfores the use of message instances instead of plain objects",
+        "cmt14": [
+                "Specifies the wrapper to use. Also accepts a path to require a custom wrapper.",
+                "default   Default wrapper supporting both CommonJS and AMD",
+                "commonjs  CommonJS wrapper",
+                "amd       AMD wrapper",
+                "es6       ES6 wrapper (implies --es6)",
+                "closure   A closure adding to protobuf.roots where protobuf is a global"
+        ],
+        "-w"?: string
     },
     "defOptions": {
         "-c01": [

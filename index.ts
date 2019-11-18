@@ -119,7 +119,16 @@ type ProtobufConfig = {
         "--no-comments"?: boolean,  "cmt10": "Does not output any JSDoc comments.",
         "--force-long"?: boolean,   "cmt11": "Enfores the use of 'Long' for s-/u-/int64 and s-/fixed64 fields.",
         "--force-number"?: boolean, "cmt12": "Enfores the use of 'number' for s-/u-/int64 and s-/fixed64 fields.",
-        "--force-message"?: boolean,"cmt13": "Enfores the use of message instances instead of plain objects"
+        "--force-message"?: boolean,"cmt13": "Enfores the use of message instances instead of plain objects",
+        "cmt14": [
+                "Specifies the wrapper to use. Also accepts a path to require a custom wrapper.",
+                "default   Default wrapper supporting both CommonJS and AMD",
+                "commonjs  CommonJS wrapper",
+                "amd       AMD wrapper",
+                "es6       ES6 wrapper (implies --es6)",
+                "closure   A closure adding to protobuf.roots where protobuf is a global"
+        ],
+        "-w"?: string
     },
     "defOptions": {
         "-c01": [
@@ -253,8 +262,8 @@ async function generate(_rootDir: string, sourceFile?: string, outJsFile?: strin
 	if (!gCfg.defOptions.nodeMode) {
 		pbjsResult = `var $protobuf = window.protobuf;\n$protobuf.roots.default=window;\n` + pbjsResult;
 	} else {
+		pbjsResult = pbjsResult.replace(/require\(\"protobufjs\/minimal\"\)/g, 'protobuf || require("protobufjs/minimal")');
 		// pbjsResult = `var $protobuf = require('protobufjs');\n` + pbjsResult;
-		pbjsResult = pbjsResult;// do nothing
 	}
 	logger(`gen js file :${green(jsOutFile)}`);
 	logger(`file size   :${yellow(format_size(pbjsResult.length))}`);
@@ -442,7 +451,9 @@ async function gen_packageCmdMode_content(protoRoot: string, protoFileList: stri
 						: '';
 	const tsdef_to_outfile_relative_dir = RelativePath(path.dirname(gCfg.defOptions.outTSDefFile), StripExt(gCfg.outputFile));
 	const sproto_reference_content = gCfg.defOptions.nodeMode
-						? `/// <reference path='${tsdef_to_outfile_relative_dir}.d.ts'/>\nimport * as p from '${tsdef_to_outfile_relative_dir}';\n`
+						? `/// <reference path='${tsdef_to_outfile_relative_dir}.d.ts'/>\n`
+						 +`import * as p from '${tsdef_to_outfile_relative_dir}';\n`
+						 +`export * from '${tsdef_to_outfile_relative_dir}';`
 						: '';
 	const sproto_module_head = !NullStr(gCfg.defOptions.rootModule)
 						? `${sproto_export}module ${gCfg.defOptions.rootModule} {\n`
@@ -499,7 +510,9 @@ async function gen_packageCmdFastMode_content(protoRoot: string, protoFileList: 
 						: '';
 	const tsdef_to_outfile_relative_dir = RelativePath(path.dirname(gCfg.defOptions.outTSDefFile), StripExt(gCfg.outputFile));
 	const sproto_reference_content = gCfg.defOptions.nodeMode
-						? `/// <reference path='${tsdef_to_outfile_relative_dir}.d.ts'/>\nimport * as p from '${tsdef_to_outfile_relative_dir}';\n`
+						? `/// <reference path='${tsdef_to_outfile_relative_dir}.d.ts'/>\n`
+						 +`import * as p from '${tsdef_to_outfile_relative_dir}';\n`
+						 +`export * from '${tsdef_to_outfile_relative_dir}';`
 						: '';
 	const sproto_module_head = !NullStr(gCfg.defOptions.rootModule)
 						? `${sproto_export}module ${gCfg.defOptions.rootModule} {\n`
@@ -630,7 +643,9 @@ async function gen_NormalMode_content(protoRoot: string, protoFileList: string[]
 						: '';
 	const tsdef_to_outfile_relative_dir = RelativePath(path.dirname(gCfg.defOptions.outTSDefFile), StripExt(gCfg.outputFile));
 	const sproto_reference_content = gCfg.defOptions.nodeMode
-						? `/// <reference path='${tsdef_to_outfile_relative_dir}.d.ts'/>\nimport * as p from '${tsdef_to_outfile_relative_dir}';\n`
+						? `/// <reference path='${tsdef_to_outfile_relative_dir}.d.ts'/>\n`
+						 +`import * as p from '${tsdef_to_outfile_relative_dir}';\n`
+						 +`export * from '${tsdef_to_outfile_relative_dir}';`
 						: '';
 	const sproto_module_head = !NullStr(gCfg.defOptions.rootModule)
 						? `${sproto_export}module ${gCfg.defOptions.rootModule} {\n`
@@ -817,7 +832,9 @@ async function gen_EnumCmdMode_content(protoRoot: string, protoFileList: string[
 						: '';
 	const tsdef_to_outfile_relative_dir = RelativePath(path.dirname(gCfg.defOptions.outTSDefFile), StripExt(gCfg.outputFile));
 	const sproto_reference_content = gCfg.defOptions.nodeMode
-						? `/// <reference path='${tsdef_to_outfile_relative_dir}.d.ts'/>\nimport * as p from '${tsdef_to_outfile_relative_dir}';\n`
+						? `/// <reference path='${tsdef_to_outfile_relative_dir}.d.ts'/>\n`
+						 +`import * as p from '${tsdef_to_outfile_relative_dir}';\n`
+						 +`export * from '${tsdef_to_outfile_relative_dir}';`
 						: '';
 	const sproto_module_head = !NullStr(gCfg.defOptions.rootModule)
 						? `${sproto_export}module ${gCfg.defOptions.rootModule} {\n`
