@@ -84,7 +84,7 @@ const _HandlerMap = {
 		return undefined;
 	}
 	try {
-		return cmd_handler.decode(buffer);
+		return <IMsgMap[T][T1]>cmd_handler.decode(buffer);
 	} catch (ex) {
 		console.error(`Decode package_id:${package_id} message_id:${message_id} failure. error:${ex}`);
 	}

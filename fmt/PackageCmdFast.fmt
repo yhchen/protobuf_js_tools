@@ -69,7 +69,7 @@ const _HandlerMap = {
 		return undefined;
 	}
 	try {
-		return package_handler.decode(buffer);
+		return <IMsgMap[T]>package_handler.decode(buffer);
 	} catch (ex) {
 		console.error(`Decode package_id:${package_id} failure. error:${ex}`);
 	}
