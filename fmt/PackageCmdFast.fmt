@@ -20,7 +20,6 @@ const _SCHandlerMap = {
 
 {7}interface IHandler<T extends keyof IMsgMap> {
 	readonly sid: T;//		package_id for index(string)
-	readonly id: number;//	package_id for speed up send proto(number)
 	readonly pt: any,//		protobuf-static class pointer
 };
 const _HandlerMap = {
