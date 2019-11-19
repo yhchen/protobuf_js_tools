@@ -30,7 +30,7 @@
             "es6       ES6 wrapper (implies --es6)",
             "closure   A closure adding to protobuf.roots where protobuf is a global"
         ],
-        "-w": "commonjs"
+        "-w": "default"
     },
     "defOptions": {
         "-c01": [
