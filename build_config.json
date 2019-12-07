@@ -66,8 +66,9 @@
         "GenMode": "EnumCmd",
         "packageCmdFmt": "0x%02x%02x",                  "-c02": "package cmd mode id format(for packageageCmdMode=true)",
         "rootModule": "puremvc",                        "-c03": "root module for export file",
-        "nodeMode": true,                             "-c04": "nodejs mode for `export`",
+        "nodeMode": true,                               "-c04": "nodejs mode for `export`",
         "importPath": "protobufjs/minimal",             "-c05": "import protobuf file(only available for nodeMode=true)",
+        "GlobalProtobufLibNamespace": "",               "-c06": "'': don't use global protobuf library. 'global' or 'window' for server or client (only available for nodeMode=true)",
         "outTSDefFile": "./test/def/proto_def.ts"
     },
     "sourceRoot": "./proto/",
