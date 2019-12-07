@@ -419,13 +419,13 @@ async function gen_packageCmdMode_content(protoRoot: string, protoFileList: stri
 	let sproto_SCHandlerMap = '';
 	let sproto_HandlerMap = '';
 	const sproto_protobuf_import = gCfg.defOptions.nodeMode ? 'p.' : '';
-	const fmt_package = function(sysid: string, comment?: string):string { return `${comment?'\t'+comment+'\n':''}\t'${sysid}': {\n`; }
-	const fmt_type_package = function(sysid: string, comment?: string):string { return `${comment?'\t'+comment+'\n':''}\t${sysid}: {\n`; }
+	const fmt_package = function(sysid: string, comment?: string):string { return `${comment?'    '+comment+'\n':''}    '${sysid}': {\n`; }
+	const fmt_type_package = function(sysid: string, comment?: string):string { return `${comment?'    '+comment+'\n':''}    ${sysid}: {\n`; }
 	const fmt_message = function(cmdid: string, package_name: string, message_name: string, comment?: string): string {
-		return `${comment?'\t\t'+comment+'\n':''}\t\t'${cmdid}': ${sproto_protobuf_import}${package_name}.${message_name},\n`;
+		return `${comment?'        '+comment+'\n':''}        '${cmdid}': ${sproto_protobuf_import}${package_name}.${message_name},\n`;
 	}
 	const fmt_type_message = function(sysid: string, cmdid: string, package_name: string, msgname: string, comment?: string): string {
-		return `${comment?'\t\t'+comment+'\n':''}\t\t${msgname}: <IHandler<'${sysid}', '${cmdid}'>>{s: '${sysid}', c: '${cmdid}', ns: ${sysid}, nc: ${cmdid}, `
+		return `${comment?'        '+comment+'\n':''}        ${msgname}: <IHandler<'${sysid}', '${cmdid}'>>{s: '${sysid}', c: '${cmdid}', ns: ${sysid}, nc: ${cmdid}, `
 					+ `pt: ${sproto_protobuf_import}${package_name}.${msgname} },\n`;
 	}
 
@@ -440,9 +440,9 @@ async function gen_packageCmdMode_content(protoRoot: string, protoFileList: stri
 			sproto_SCHandlerMap += fmt_message(cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name);
 			sproto_HandlerMap += fmt_type_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name, p_def.message_list[cmd_id].comment);
 		}
-		sproto_IMsgMap += '\t},\n';
-		sproto_SCHandlerMap += '\t},\n';
-		sproto_HandlerMap += '\t},\n';
+		sproto_IMsgMap += '    },\n';
+		sproto_SCHandlerMap += '    },\n';
+		sproto_HandlerMap += '    },\n';
 	}
 
 	const sproto_export = gCfg.defOptions.nodeMode ? 'export ' : '';
@@ -480,13 +480,13 @@ async function gen_packageCmdFastMode_content(protoRoot: string, protoFileList: 
 	let sproto_SCHandlerMap = '';
 	let sproto_HandlerMap = '';
 	const sproto_protobuf_import = gCfg.defOptions.nodeMode ? 'p.' : '';
-	const fmt_package = function(packageName: string, comment?: string):string { return `\t// ${packageName}\n${comment?'\t'+comment+'\n':''}`; }
-	const fmt_type_package = function(packageName: string, comment?: string):string { return `\t// ${packageName}\n${comment?'\t'+comment+'\n':''}\t${packageName}: {\n`; }
+	const fmt_package = function(packageName: string, comment?: string):string { return `    // ${packageName}\n${comment?'    '+comment+'\n':''}`; }
+	const fmt_type_package = function(packageName: string, comment?: string):string { return `    // ${packageName}\n${comment?'    '+comment+'\n':''}    ${packageName}: {\n`; }
 	const fmt_message = function(sysid: string, cmdid: string, package_name: string, message_name: string, comment?: string): string {
-		return `${comment?'\t'+comment+'\n':''}\t${fmt_sid(sysid, cmdid)}: ${sproto_protobuf_import}${package_name}.${message_name},\n`;
+		return `${comment?'    '+comment+'\n':''}    ${fmt_sid(sysid, cmdid)}: ${sproto_protobuf_import}${package_name}.${message_name},\n`;
 	}
 	const fmt_type_message = function(sysid: string, cmdid: string, package_name: string, msgname: string, comment?: string): string {
-		return `${comment?'\t\t'+comment+'\n':''}\t\t${msgname}: <IHandler<${fmt_sid(sysid, cmdid)}>>{sid: ${fmt_sid(sysid, cmdid)}, `
+		return `${comment?'        '+comment+'\n':''}        ${msgname}: <IHandler<${fmt_sid(sysid, cmdid)}>>{sid: ${fmt_sid(sysid, cmdid)}, `
 					+ `pt: ${sproto_protobuf_import}${package_name}.${msgname} },\n`;
 	}
 
@@ -501,7 +501,7 @@ async function gen_packageCmdFastMode_content(protoRoot: string, protoFileList: 
 			sproto_SCHandlerMap += fmt_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name);
 			sproto_HandlerMap += fmt_type_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name, p_def.message_list[cmd_id].comment);
 		}
-		sproto_HandlerMap += `\t},\n`;
+		sproto_HandlerMap += `    },\n`;
 	}
 
 	const sproto_export = gCfg.defOptions.nodeMode ? 'export ' : '';
@@ -624,15 +624,15 @@ async function gen_NormalMode_content(protoRoot: string, protoFileList: string[]
 			const cname = cmessage.name;
 			if (pname != def_no_package_name) {
 				if (package_count <= 2) {
-					sproto_INotifyType += `\t'${cname}': ${sproto_protobuf_import}${pname}.I${cname},${cmessage.comment? '\t' + cmessage.comment : ''}\n`;
-					sproto_NotifyType += `${cmessage.comment?'\t'+cmessage.comment+'\n':''}\t${cname}: '${cname}',\n`;
+					sproto_INotifyType += `    '${cname}': ${sproto_protobuf_import}${pname}.I${cname},${cmessage.comment? '    ' + cmessage.comment : ''}\n`;
+					sproto_NotifyType += `${cmessage.comment?'    '+cmessage.comment+'\n':''}    ${cname}: '${cname}',\n`;
 				} else {
-					sproto_INotifyType += `\t'${pname}_${cname}': ${sproto_protobuf_import}${pname}.I${cname},${cmessage.comment? '\t' + cmessage.comment : ''}\n`;
-					sproto_NotifyType += `${cmessage.comment?'\t'+cmessage.comment+'\n':''}\t${pname}_${cname}: '${pname}_${cname}',\n`;
+					sproto_INotifyType += `    '${pname}_${cname}': ${sproto_protobuf_import}${pname}.I${cname},${cmessage.comment? '    ' + cmessage.comment : ''}\n`;
+					sproto_NotifyType += `${cmessage.comment?'    '+cmessage.comment+'\n':''}    ${pname}_${cname}: '${pname}_${cname}',\n`;
 				}
 			} else {
-				sproto_INotifyType += `\t'${cname}': ${sproto_protobuf_import}I${cname},\n`;
-				sproto_NotifyType += `${cmessage.comment?'\t'+cmessage.comment+'\n':''}\t${cname}: '${cname}',\n`;
+				sproto_INotifyType += `    '${cname}': ${sproto_protobuf_import}I${cname},\n`;
+				sproto_NotifyType += `${cmessage.comment?'    '+cmessage.comment+'\n':''}    ${cname}: '${cname}',\n`;
 			}
 		}
 	}
@@ -690,7 +690,7 @@ async function generate_EnumCmdMode_tables(protoRoot: string, protoFileList: str
 			lastline = line;
 			line = lines.shift().trim();
 			const originline = line;
-			line = line.replace(/\t/g, ' ').replace(/( +)/g, ' ');
+			line = line.replace(/    /g, ' ').replace(/( +)/g, ' ');
 			if (line.indexOf('//') == 0) {
 				line = line.substr(line.indexOf('//') + 2).trim();
 			}
@@ -797,15 +797,15 @@ async function gen_EnumCmdMode_content(protoRoot: string, protoFileList: string[
 	let sproto_SCHandlerMap = '';
 	let sproto_HandlerMap = '';
 	const sproto_protobuf_import = gCfg.defOptions.nodeMode ? 'p.' : '';
-	const fmt_package = function(pname: string, comment?: string):string { return `${comment?'\t'+comment+'\n':''}\t'${pname}': {\n`; }
-	const fmt_type_package = function(pname: string, comment?: string):string { return `${comment?'\t'+comment+'\n':''}\t${pname}: {\n`; }
+	const fmt_package = function(pname: string, comment?: string):string { return `${comment?'    '+comment+'\n':''}    '${pname}': {\n`; }
+	const fmt_type_package = function(pname: string, comment?: string):string { return `${comment?'    '+comment+'\n':''}    ${pname}: {\n`; }
 	const fmt_message = function(message_name: string, protoname: string, comment?: string): string {
-		return `\t\t'${message_name}': ${!protoname?'':sproto_protobuf_import}${protoname},${comment?'\t'+comment:''}\n`;
+		return `        '${message_name}': ${!protoname?'':sproto_protobuf_import}${protoname},${comment?'    '+comment:''}\n`;
 	}
 	const fmt_type_message = function(package_name: string, message_name: string, protoname: string, package_id: string, message_id: string, comment?: string): string {
-		return `\t\t${message_name}: <IHandler<'${package_name}', '${message_name}'>>`
+		return `        ${message_name}: <IHandler<'${package_name}', '${message_name}'>>`
 					+ `{p: '${package_name}', m: '${message_name}', sid: ${fmt_sid(package_id, message_id)}, `
-					+ `mid: ${fmt_id(package_id, message_id)}, pt: ${!protoname?'':sproto_protobuf_import}${protoname} },${comment?'\t'+comment:''}\n`;
+					+ `pt: ${!protoname?'':sproto_protobuf_import}${protoname} },${comment?'    '+comment:''}\n`;
 	}
 
 	for (let package_name in package_def) {
@@ -821,9 +821,9 @@ async function gen_EnumCmdMode_content(protoRoot: string, protoFileList: string[
 
 			sproto_HandlerMap += fmt_type_message(package_name, message_name, m_def.proto, p_def.package_id.toString(), m_def.id.toString(), m_def.comment);
 		}
-		sproto_IMsgMap += '\t},\n';
-		sproto_SCHandlerMap += '\t},\n';
-		sproto_HandlerMap += '\t},\n';
+		sproto_IMsgMap += '    },\n';
+		sproto_SCHandlerMap += '    },\n';
+		sproto_HandlerMap += '    },\n';
 	}
 
 	const sproto_export = gCfg.defOptions.nodeMode ? 'export ' : '';
