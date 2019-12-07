@@ -32,7 +32,7 @@ const _HandlerMap = {
 };
 {7}const HandlerMap = _HandlerMap as _DeepReadonly<typeof _HandlerMap>;
 
-{7}function EncodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, proto: IMsgMap[T][T1]) : Uint8Array|undefined {
+{7}function EncodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, proto: IMsgMap[T][T1]): Uint8Array|undefined {
     try {
         let buffer: protobuf.Writer = _handler.pt.encode(proto);
         return buffer.finish();
@@ -42,7 +42,7 @@ const _HandlerMap = {
     return undefined;
 }
 
-{7}function DecodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, buffer: Uint8Array) : IMsgMap[T][T1]|undefined {
+{7}function DecodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, buffer: Uint8Array): IMsgMap[T][T1]|undefined {
     try {
         return _handler.pt.decode(buffer);
     } catch (ex) {
@@ -52,7 +52,7 @@ const _HandlerMap = {
 }
 
 
-{7}function EncodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(package_id: T, message_id: T1, proto: IMsgMap[T][T1]) : Uint8Array|undefined {
+{7}function EncodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(package_id: T, message_id: T1, proto: IMsgMap[T][T1]): Uint8Array|undefined {
     const package_handler = SCHandlerMap[package_id];
     if (package_handler == null) {
         console.error(`Encode Proto failure. package type package_id:[${package_id}] message_id:${message_id}] not found.`);
@@ -72,7 +72,7 @@ const _HandlerMap = {
     return undefined;
 }
 
-{7}function DecodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(package_id: T, message_id: T1, buffer: Uint8Array) : IMsgMap[T][T1]|undefined {
+{7}function DecodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(package_id: T, message_id: T1, buffer: Uint8Array): IMsgMap[T][T1]|undefined {
     const package_handler = SCHandlerMap[package_id];
     if (package_handler == null) {
         console.error(`Decode Proto failure. package type package_id:[${package_id}] message_id:${message_id}] not found.`);

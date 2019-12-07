@@ -27,7 +27,7 @@ const _HandlerMap = {
 };
 {7}const HandlerMap = _HandlerMap as _DeepReadonly<typeof _HandlerMap>;
 
-{7}function EncodeH<T extends keyof IMsgMap>(_handler: IHandler<T>, proto: IMsgMap[T]) : Uint8Array|undefined {
+{7}function EncodeH<T extends keyof IMsgMap>(_handler: IHandler<T>, proto: IMsgMap[T]): Uint8Array|undefined {
     try {
         let buffer: protobuf.Writer = _handler.pt.encode(proto);
         return buffer.finish();
@@ -37,7 +37,7 @@ const _HandlerMap = {
     return undefined;
 }
 
-{7}function DecodeH<T extends keyof IMsgMap>(_handler: IHandler<T>, buffer: Uint8Array) : IMsgMap[T]|undefined {
+{7}function DecodeH<T extends keyof IMsgMap>(_handler: IHandler<T>, buffer: Uint8Array): IMsgMap[T]|undefined {
     try {
         return _handler.pt.decode(buffer);
     } catch (ex) {
@@ -46,7 +46,7 @@ const _HandlerMap = {
     return undefined;
 }
 
-{7}function EncodeSC<T extends keyof IMsgMap>(package_id: T, proto: IMsgMap[T]) : Uint8Array|undefined {
+{7}function EncodeSC<T extends keyof IMsgMap>(package_id: T, proto: IMsgMap[T]): Uint8Array|undefined {
     const package_handler = _SCHandlerMap[package_id];
     if (package_handler == null || (<any>package_handler).encode == null) {
         console.error(`Encode Proto failure. package type package_id:[${package_id}] not found.`);
@@ -61,7 +61,7 @@ const _HandlerMap = {
     return undefined;
 }
 
-{7}function DecodeSC<T extends keyof IMsgMap>(package_id: T, buffer: Uint8Array) : IMsgMap[T]|undefined {
+{7}function DecodeSC<T extends keyof IMsgMap>(package_id: T, buffer: Uint8Array): IMsgMap[T]|undefined {
     const package_handler = _SCHandlerMap[package_id];
     if (package_handler == null) {
         console.error(`Decode Proto failure. package type package_id:[${package_id}] not found.`);
