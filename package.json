@@ -1,6 +1,6 @@
 {
   "name": "protobuf_js_tools",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "build *.proto files to static js and ts files",
   "main": "./bin/build_proto_files.js",
   "scripts": {

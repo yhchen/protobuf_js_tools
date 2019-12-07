@@ -457,7 +457,7 @@ async function gen_packageCmdMode_content(protoRoot: string, protoFileList: stri
         + `export * from '${tsdef_to_outfile_relative_dir}';`
         : '';
     const sproto_module_head = !NullStr(gCfg.defOptions.rootModule)
-        ? `${sproto_export}module ${gCfg.defOptions.rootModule} {\n`
+        ? `${sproto_export}namespace ${gCfg.defOptions.rootModule} {\n`
         : '';
     const sproto_module_tail = !NullStr(gCfg.defOptions.rootModule) ? '}\n' : '';
     const sproto_export_module = !NullStr(gCfg.defOptions.rootModule) || gCfg.defOptions.nodeMode ? 'export ' : '';
@@ -516,7 +516,7 @@ async function gen_packageCmdFastMode_content(protoRoot: string, protoFileList: 
         + `export * from '${tsdef_to_outfile_relative_dir}';`
         : '';
     const sproto_module_head = !NullStr(gCfg.defOptions.rootModule)
-        ? `${sproto_export}module ${gCfg.defOptions.rootModule} {\n`
+        ? `${sproto_export}namespace ${gCfg.defOptions.rootModule} {\n`
         : '';
     const sproto_module_tail = !NullStr(gCfg.defOptions.rootModule) ? '}\n' : '';
     const sproto_export_module = !NullStr(gCfg.defOptions.rootModule) || gCfg.defOptions.nodeMode ? 'export ' : '';
@@ -648,7 +648,7 @@ async function gen_NormalMode_content(protoRoot: string, protoFileList: string[]
         + `export * from '${tsdef_to_outfile_relative_dir}';`
         : '';
     const sproto_module_head = !NullStr(gCfg.defOptions.rootModule)
-        ? `${sproto_export}module ${gCfg.defOptions.rootModule} {\n`
+        ? `${sproto_export}namespace ${gCfg.defOptions.rootModule} {\n`
         : '';
     const sproto_module_tail = !NullStr(gCfg.defOptions.rootModule) ? '}\n' : '';
     const sproto_export_module = !NullStr(gCfg.defOptions.rootModule) ? 'export ' : '';
@@ -836,7 +836,7 @@ async function gen_EnumCmdMode_content(protoRoot: string, protoFileList: string[
         + `export * from '${tsdef_to_outfile_relative_dir}';`
         : '';
     const sproto_module_head = !NullStr(gCfg.defOptions.rootModule)
-        ? `${sproto_export}module ${gCfg.defOptions.rootModule} {\n`
+        ? `${sproto_export}namespace ${gCfg.defOptions.rootModule} {\n`
         : '';
     const sproto_module_tail = !NullStr(gCfg.defOptions.rootModule) ? '}\n' : '';
     const sproto_export_module = !NullStr(gCfg.defOptions.rootModule) || gCfg.defOptions.nodeMode ? 'export ' : '';
