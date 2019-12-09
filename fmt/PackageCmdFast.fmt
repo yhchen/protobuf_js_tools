@@ -8,6 +8,9 @@ type _DeepReadonly<T> = {
     readonly [P in keyof T]: _DeepReadonly<T[P]>;
 };
 
+// proto enum type
+{7}const enum EMsgType {{8}};
+
 // Proto Msg Check
 {7}type IMsgMap = {
 {3}

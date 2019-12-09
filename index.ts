@@ -488,29 +488,35 @@ async function gen_packageCmdMode_content(protoRoot: string, protoFileList: stri
 
 async function gen_packageCmdFastMode_content(protoRoot: string, protoFileList: string[]): Promise<string> {
     let package_def: PackageCmdModeDef = await generate_packageCmdMode_tables(protoRoot, protoFileList);
+    let sproto_EMsgTypeMap = '';
     let sproto_IMsgMap = '';
     let sproto_SCHandlerMap = '';
     let sproto_HandlerMap = '';
     const sproto_protobuf_import = gCfg.defOptions.nodeMode ? 'p.' : '';
-    const fmt_package = function (packageName: string, comment?: string): string { return `    // ${packageName}\n${comment ? '    ' + comment + '\n' : ''}`; }
+    const fmt_package = function (pname: string, comment?: string): string { return `    // ${pname}\n${comment ? '    ' + comment + '\n' : ''}`; }
     const fmt_type_package = function (packageName: string, comment?: string): string { return `    // ${packageName}\n${comment ? '    ' + comment + '\n' : ''}    ${packageName}: {\n`; }
-    const fmt_message = function (sysid: string, cmdid: string, package_name: string, message_name: string, comment?: string): string {
-        return `${comment ? '    ' + comment + '\n' : ''}    ${fmt_sid(sysid, cmdid)}: ${sproto_protobuf_import}${package_name}.${message_name},\n`;
+    const fmt_message = function (sysid: string, cmdid: string, pname: string, mname: string, imname: string, comment?: string): string {
+        return `${comment ? '    ' + comment + '\n' : ''}    [EMsgType.${pname}_${mname}]: ${sproto_protobuf_import}${pname}.${mname},\n`;
+    }
+    const fmt_enum = function (pname: string, mname: string, pid: string, mid: string, comment?: string): string {
+        return `    ${pname}_${mname} = ${fmt_sid(pid, mid)},${comment ? '    ' + comment : ''}\n`;
     }
     const fmt_type_message = function (sysid: string, cmdid: string, package_name: string, msgname: string, comment?: string): string {
-        return `${comment ? '        ' + comment + '\n' : ''}        ${msgname}: <IHandler<${fmt_sid(sysid, cmdid)}>>{sid: ${fmt_sid(sysid, cmdid)}, `
+        return `${comment ? '        ' + comment + '\n' : ''}        ${msgname}: <IHandler<EMsgType.${package_name}_${msgname}>>{sid: EMsgType.${package_name}_${msgname}, `
             + `pt: ${sproto_protobuf_import}${package_name}.${msgname} },\n`;
     }
 
 
     for (let package_id in package_def) {
-        const p_def = package_def[package_id];
+		const p_def = package_def[package_id];
+		sproto_EMsgTypeMap += `\n    // ${p_def.commemt ? p_def.commemt : p_def.package_name}\n`;
         sproto_IMsgMap += fmt_package(p_def.package_name/*, package_def[package_id].commemt*/);
         sproto_SCHandlerMap += fmt_package(p_def.package_name/*, package_def[package_id].commemt*/);
         sproto_HandlerMap += fmt_type_package(p_def.package_name, package_def[package_id].commemt);
         for (let cmd_id in p_def.message_list) {
-            sproto_IMsgMap += fmt_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].imessage_name);
-            sproto_SCHandlerMap += fmt_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name);
+            sproto_EMsgTypeMap += fmt_enum(p_def.package_name, p_def.message_list[cmd_id].message_name, package_id, cmd_id, p_def.message_list[cmd_id].comment);
+            sproto_IMsgMap += fmt_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name, p_def.message_list[cmd_id].imessage_name);
+            sproto_SCHandlerMap += fmt_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name, p_def.message_list[cmd_id].imessage_name);
             sproto_HandlerMap += fmt_type_message(package_id, cmd_id, p_def.package_name, p_def.message_list[cmd_id].message_name, p_def.message_list[cmd_id].comment);
         }
         sproto_HandlerMap += `    },\n`;
@@ -540,7 +546,8 @@ async function gen_packageCmdFastMode_content(protoRoot: string, protoFileList: 
         sproto_SCHandlerMap,
         sproto_HandlerMap,
         sproto_module_tail,
-        sproto_export_module
+		sproto_export_module,
+		sproto_EMsgTypeMap,
     );
     return sproto_file_content;
 }

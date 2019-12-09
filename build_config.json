@@ -63,7 +63,7 @@
             "            message TestMsg { }",
             ""
             ],
-        "GenMode": "EnumCmd",
+        "GenMode": "PackageCmdFast",
         "packageCmdFmt": "0x%02x%02x",                  "-c02": "package cmd mode id format(for packageageCmdMode=true)",
         "rootModule": "puremvc",                        "-c03": "root module for export file",
         "nodeMode": true,                               "-c04": "nodejs mode for `export`",
