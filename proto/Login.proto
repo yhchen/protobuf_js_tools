@@ -1,3 +1,5 @@
+syntax = "proto3";
+
 // Login package
 package Login; //$1
 
