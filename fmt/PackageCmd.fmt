@@ -2,93 +2,93 @@
 {2}
 
 /**
-	* 递归将 “T” 中及其子对象所有属性设置为只读
-	* Make all properties recursive in T readonly
-	*/
+ * 递归将 “T” 中及其子对象所有属性设置为只读
+ * Make all properties recursive in T readonly
+ */
 type _DeepReadonly<T> = {
-	readonly [P in keyof T]: _DeepReadonly<T[P]>;
+    readonly [P in keyof T]: _DeepReadonly<T[P]>;
 };
 
-//Proto Msg Check
+// Proto Msg Check
 {7}type IMsgMap = {
 {3}
 };
 
-//Proto Msg Handler
+// Proto Msg Handler
 const _SCHandlerMap = {
 {4}
 };
 {7}const SCHandlerMap = _SCHandlerMap as _DeepReadonly<typeof _SCHandlerMap>;
 
 {7}interface IHandler<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]> {
-	readonly s: T;//		package_id(string)
-	readonly c: T1;//		message_id(string)
-	readonly ns?: number,//	package_id(number)
-	readonly nc?: number,//	message_id(number)
-	readonly pt: any,//		protobuf-static class pointer
+    readonly s: T; //           package_id(string)
+    readonly c: T1; //          message_id(string)
+    readonly ns?: number, //    package_id(number)
+    readonly nc?: number, //    message_id(number)
+    readonly pt: any, //        protobuf-static class pointer
 };
 const _HandlerMap = {
 {5}
 };
 {7}const HandlerMap = _HandlerMap as _DeepReadonly<typeof _HandlerMap>;
 
-{7}function EncodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, proto: IMsgMap[T][T1]) : Uint8Array|undefined {
-	try {
-		let buffer: protobuf.Writer = _handler.pt.encode(proto);
-		return buffer.finish();
-	} catch (ex) {
-		console.error(`Encode package_id:${_handler.s} message_id:${_handler.c} failure. error:${ex}`);
-	}
-	return undefined;
+{7}function EncodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, proto: IMsgMap[T][T1]): Uint8Array|undefined {
+    try {
+        let buffer: protobuf.Writer = _handler.pt.encode(proto);
+        return buffer.finish();
+    } catch (ex) {
+        console.error(`Encode package_id:${_handler.s} message_id:${_handler.c} failure. error:${ex}`);
+    }
+    return undefined;
 }
 
-{7}function DecodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, buffer: Uint8Array) : IMsgMap[T][T1]|undefined {
-	try {
-		return _handler.pt.decode(buffer);
-	} catch (ex) {
-		console.error(`Decode package_id:${_handler.s} message_id:${_handler.c} failure. error:${ex}`);
-	}
-	return undefined;
+{7}function DecodeH<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(_handler: IHandler<T, T1>, buffer: Uint8Array): IMsgMap[T][T1]|undefined {
+    try {
+        return _handler.pt.decode(buffer);
+    } catch (ex) {
+        console.error(`Decode package_id:${_handler.s} message_id:${_handler.c} failure. error:${ex}`);
+    }
+    return undefined;
 }
 
 
-{7}function EncodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(package_id: T, message_id: T1, proto: IMsgMap[T][T1]) : Uint8Array|undefined {
-	const package_handler = SCHandlerMap[package_id];
-	if (package_handler == null) {
-		console.error(`Encode Proto failure. package type package_id:[${package_id}] message_id:${message_id}] not found.`);
-		return undefined;
-	}
-	const cmd_handler = package_handler[<string>message_id];
-	if (cmd_handler == null) {
-		console.error(`Encode Proto failure. proto type package_id:[${package_id}] message_id:${message_id}] not found.`);
-		return undefined;
-	}
-	try {
-		let buffer: protobuf.Writer = cmd_handler.encode(proto);
-		return buffer.finish();
-	} catch (ex) {
-		console.error(`Encode package_id:${package_id} message_id:${message_id} failure. error:${ex}`);
-	}
-	return undefined;
+{7}function EncodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(package_id: T, message_id: T1, proto: IMsgMap[T][T1]): Uint8Array|undefined {
+    const package_handler = SCHandlerMap[package_id];
+    if (package_handler == null) {
+        console.error(`Encode Proto failure. package type package_id:[${package_id}] message_id:${message_id}] not found.`);
+        return undefined;
+    }
+    const cmd_handler = package_handler[<string>message_id];
+    if (cmd_handler == null) {
+        console.error(`Encode Proto failure. proto type package_id:[${package_id}] message_id:${message_id}] not found.`);
+        return undefined;
+    }
+    try {
+        let buffer: protobuf.Writer = cmd_handler.encode(proto);
+        return buffer.finish();
+    } catch (ex) {
+        console.error(`Encode package_id:${package_id} message_id:${message_id} failure. error:${ex}`);
+    }
+    return undefined;
 }
 
-{7}function DecodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(package_id: T, message_id: T1, buffer: Uint8Array) : IMsgMap[T][T1]|undefined {
-	const package_handler = SCHandlerMap[package_id];
-	if (package_handler == null) {
-		console.error(`Decode Proto failure. package type package_id:[${package_id}] message_id:${message_id}] not found.`);
-		return undefined;
-	}
-	const cmd_handler = package_handler[<string>message_id];
-	if (cmd_handler == null) {
-		console.error(`Decode Proto failure. proto type package_id:[${package_id}] message_id:${message_id}] not found.`);
-		return undefined;
-	}
-	try {
-		return <IMsgMap[T][T1]>cmd_handler.decode(buffer);
-	} catch (ex) {
-		console.error(`Decode package_id:${package_id} message_id:${message_id} failure. error:${ex}`);
-	}
-	return undefined;
+{7}function DecodeSC<T extends keyof IMsgMap, T1 extends keyof IMsgMap[T]>(package_id: T, message_id: T1, buffer: Uint8Array): IMsgMap[T][T1]|undefined {
+    const package_handler = SCHandlerMap[package_id];
+    if (package_handler == null) {
+        console.error(`Decode Proto failure. package type package_id:[${package_id}] message_id:${message_id}] not found.`);
+        return undefined;
+    }
+    const cmd_handler = package_handler[<string>message_id];
+    if (cmd_handler == null) {
+        console.error(`Decode Proto failure. proto type package_id:[${package_id}] message_id:${message_id}] not found.`);
+        return undefined;
+    }
+    try {
+        return <IMsgMap[T][T1]>cmd_handler.decode(buffer);
+    } catch (ex) {
+        console.error(`Decode package_id:${package_id} message_id:${message_id} failure. error:${ex}`);
+    }
+    return undefined;
 }
 
 {6}

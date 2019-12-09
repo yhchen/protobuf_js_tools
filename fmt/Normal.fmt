@@ -6,7 +6,7 @@
  * Make all properties recursive in T readonly
  */
 type _DeepReadonly<T> = {
-	readonly [P in keyof T]: _DeepReadonly<T[P]>;
+    readonly [P in keyof T]: _DeepReadonly<T[P]>;
 };
 
 // notify type
@@ -15,7 +15,7 @@ type INotifyType = _DeepReadonly<{
 }>;
 
 type _DefKeyEnum<T> = {
-	[P in keyof T]: P
+    [P in keyof T]: P
 };
 
 {6}const NotifyType: _DeepReadonly<_DefKeyEnum<INotifyType>> = {
@@ -24,15 +24,14 @@ type _DefKeyEnum<T> = {
 
 /* // for example useage
  * {6}function RegNotify<T extends keyof typeof NotifyType>(eventType: T, listener:(data: _DeepReadonly<INotifyType[T]>)=>void): void {
- * 	eventType;
- * 	listener;
+ *      eventType;
+ *      listener;
  * }
  * // for example useage
  * {6}function DispatchNotify<T extends keyof typeof NotifyType>(eventType: T, data?:_DeepReadonly<INotifyType[T]>): void {
- * 	eventType;
- * 	data;
+ *      eventType;
+ *      data;
  * }
  */
 
 {5}
-

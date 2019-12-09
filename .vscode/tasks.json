@@ -13,7 +13,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "isBackground": true,
+            "isBackground": false,
             "presentation": {
                 "echo": true,
                 "reveal": "silent",
@@ -24,7 +24,7 @@
         {
             "label": "shell",
             "type": "shell",
-            "command":{
+            "command": {
                 "quoting": "strong",
                 "value": "./run"
             },
