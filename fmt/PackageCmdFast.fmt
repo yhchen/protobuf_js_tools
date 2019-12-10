@@ -9,10 +9,10 @@ type _DeepReadonly<T> = {
 };
 
 // proto enum type
-{7}const enum EMsgType {{8}};
+{6}const enum EMsgType {{7}};
 
 // Proto Msg Check
-{7}type IMsgMap = {
+{6}type IMsgMap = {
 {3}
 };
 
@@ -21,35 +21,9 @@ const _SCHandlerMap = {
 {4}
 };
 
-{7}interface IHandler<T extends keyof IMsgMap> {
-    readonly sid: T; //     package_id for index(string)
-    readonly pt: any; //    protobuf-static class pointer
-};
-const _HandlerMap = {
-{5}
-};
-{7}const HandlerMap = _HandlerMap as _DeepReadonly<typeof _HandlerMap>;
+{6}const SCHandlerMap = (_SCHandlerMap) as _DeepReadonly<typeof _SCHandlerMap>;
 
-{7}function EncodeH<T extends keyof IMsgMap>(_handler: IHandler<T>, proto: IMsgMap[T]): Uint8Array|undefined {
-    try {
-        let buffer: protobuf.Writer = _handler.pt.encode(proto);
-        return buffer.finish();
-    } catch (ex) {
-        console.error(`Encode package_id:${_handler.sid} failure. error:${ex}`);
-    }
-    return undefined;
-}
-
-{7}function DecodeH<T extends keyof IMsgMap>(_handler: IHandler<T>, buffer: Uint8Array): IMsgMap[T]|undefined {
-    try {
-        return _handler.pt.decode(buffer);
-    } catch (ex) {
-        console.error(`Decode package_id:${_handler.sid} failure. error:${ex}`);
-    }
-    return undefined;
-}
-
-{7}function EncodeSC<T extends keyof IMsgMap>(package_id: T, proto: IMsgMap[T]): Uint8Array|undefined {
+{6}function Encode<T extends keyof IMsgMap>(package_id: T, proto: IMsgMap[T]): Uint8Array|undefined {
     const package_handler = _SCHandlerMap[package_id];
     if (package_handler == null || (<any>package_handler).encode == null) {
         console.error(`Encode Proto failure. package type package_id:[${package_id}] not found.`);
@@ -64,7 +38,7 @@ const _HandlerMap = {
     return undefined;
 }
 
-{7}function DecodeSC<T extends keyof IMsgMap>(package_id: T, buffer: Uint8Array): IMsgMap[T]|undefined {
+{6}function Decode<T extends keyof IMsgMap>(package_id: T, buffer: Uint8Array): IMsgMap[T]|undefined {
     const package_handler = _SCHandlerMap[package_id];
     if (package_handler == null) {
         console.error(`Decode Proto failure. package type package_id:[${package_id}] not found.`);
@@ -78,4 +52,4 @@ const _HandlerMap = {
     return undefined;
 }
 
-{6}
+{5}
