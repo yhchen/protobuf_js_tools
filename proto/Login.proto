@@ -1,35 +1,46 @@
 syntax = "proto3";
 
-// Login package
+// Login Package
 package Login; //$1
 
-enum EMessageDef //$Login:1
+message EnterLogicSrv //$1
 {
-	// message id can not be repeated!
-	cLoginReq = 1; //client request login $Login.LoginReq
-
-	sLoginRsp = 2; //server response login $Login.LoginRsp
+	string accountId = 1;
 }
 
-// login request proto
-message LoginReq //$1
+message QueryRoleList //$2
 {
-	required string account = 1;
-	required string token = 2;
-	required  string version = 3;
-	optional string platform = 4 ;
-
+	double accountId = 1;
 }
 
-// login response proto
-message LoginRsp //$2
+message RespRoleList //$3
 {
-	required int32 code = 1;
+	int32 code = 1;
+	double playerId = 2;
 }
 
-// test script
-message Test //$3
+message CreateRole //$4
 {
-	required int64 code = 1;
-	required uint64 test = 2;
+	double accountId = 1;
+	string roleName = 2;
+	int32 sex = 3;
+	int32 job = 4;
+}
+
+// player enter game
+message EnterGame //$5
+{
+	string account = 1;
+	double accountId = 2;
+    double playerId = 3;
+}
+
+//
+message LoginSaveData 
+{
+	string account = 1;
+	double accountId = 2;
+    double playerId = 3;
+    map<int32,string> testMap = 4;
+    repeated string testArray = 5;
 }
