@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+// Item Package
+package Item; //$3
+
+message ItemTestReq //$1
+{
+	int32 num = 1;
+	string name = 2;
+}
+
+message ItemTestMsg //$2
+{
+	int32 num = 1;
+	string name = 2;
+}
+
+//
+message ItemSaveData 
+{
+	string account = 1;
+	double accountId = 2;
+    double playerId = 3;
+    map<int32,string> testMap = 4;
+    repeated string testArray = 5;
+}
