@@ -492,7 +492,7 @@ async function gen_packageCmdFastMode_content(protoRoot: string, protoFileList: 
     let sproto_SCHandlerMap = '';
     const sproto_protobuf_import = gCfg.defOptions.nodeMode ? 'p.' : '';
     const fmt_package = function (pname: string, comment?: string): string {
-        return `    // ${pname}: ${comment ? comment : ''}\n`;
+        return `    // ${pname}${comment ? ': ' + comment : ''}\n`;
     }
     const fmt_message = function (pname: string, mname: string, comment?: string): string {
         return `${comment ? '    ' + comment + '\n' : ''}    [EMsgType.${pname}_${mname}]: ${sproto_protobuf_import}${pname}.${mname},\n`;
