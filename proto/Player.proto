@@ -3,45 +3,28 @@ syntax = "proto3";
 // Player Package
 package Player; //$2
 
-// enum EMessageDef //$Player:2
-// {
-// 	sInfo = 1; //server response Player Info $Player.Info
-// 	sTest = 2; //server test response $Player.Test
-//     sTestNoProto = 3; //server test response
-//     sTestNoEnum;//test no enum def $Player.Test
-// }
-
+// player base data
 message Info //$1
 {
-    required int32 uid = 1;
-    required string name = 2;
+    int32 uid = 1;
+    string name = 2;
+	int32 icon = 3;
 }
 
+// for test only
 message Test //$2
 {
-    required int32 avator = 1;
+    int32 avator = 1;
 }
 
-message PItem
+// for test only
+message RepeatTest //$3
 {
-    int32 itemid = 1;
-    int32 count = 2;
+    repeated Test testList = 1;
 }
 
-message Bag //$3
+// for test only
+message MapTest //$4
 {
-    repeated PItem items = 1;
-}
-
-message PTask
-{
-    int32 id = 1;
-    int32 progress = 2;
-    int32 max = 3;
-}
-
-message Task // $4
-{
-    map<int32, PTask> tasks = 1;
-    map<int32, int32> awardbox = 2;
+    map<int32, Test> testMap = 1;
 }

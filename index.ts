@@ -283,13 +283,12 @@ async function generate(_rootDir: string, sourceFile?: string, outJsFile?: strin
     // replace (type|null) => type
     pbtsResult = pbtsResult.replace(/\|null/g, '')
     // replace [ 'object' ].<string, type> => ({ [k: string]: type })
-    pbtsResult = pbtsResult.replace(/\[ 'Array' \].<(\w+).(\w+)>/, '$1.$2[]').
-        replace(/\[ 'Array' \].<(\w+)>/, '$1[]')
-    pbtsResult = pbtsResult.replace(/\[ 'object' \].<string, (\w+).(\w+)>/, '({ [k: string]: $1.$2 })').
-        replace(/\[ 'object' \].<string, (\w+)>/, '({ [k: string]: $1 })')
+    pbtsResult = pbtsResult.replace(/\[ 'Array' \]\.<(\w+)>/g, '$1[]')
+                           .replace(/\[ 'Array' \]\.<(\w+)\.(\w+)>/g, '$1.$2[]')
+    pbtsResult = pbtsResult.replace(/\[ 'object' \]\.<string, (\w+)>/g, '({ [k: string]: $1 })')
+                           .replace(/\[ 'object' \]\.<string, (\w+)\.(\w+)>/g, '({ [k: string]: $1.$2 })')
     // .replace(/\(\{ \[k: (\w+)\]: (\w+).(\w+) \}\)/g, 'Map<$1, $2.$3>')
     // .replace(/\(\{ \[k: string\]: (\w+) \}\)/g, 'Map<$1, $2>');
-    pbtsResult = pbtsResult
 
     if (gCfg.defOptions.nodeMode) {
         pbtsResult = `/// <reference types='protobufjs' />';\n\n` + pbtsResult;
