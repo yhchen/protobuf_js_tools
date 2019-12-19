@@ -38,7 +38,7 @@ const _SCHandlerMap = {
     return undefined;
 }
 
-{6}function Decode<T extends keyof IMsgMap>(package_id: T, buffer: Uint8Array): IMsgMap[T]|undefined {
+{6}function Decode<T extends keyof IMsgMap>(package_id: T, buffer: protobuf.Reader | Uint8Array): IMsgMap[T]|undefined {
     const package_handler = _SCHandlerMap[package_id];
     if (package_handler == null) {
         console.error(`Decode Proto failure. package type package_id:[${package_id}] not found.`);
