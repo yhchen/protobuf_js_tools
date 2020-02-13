@@ -285,8 +285,10 @@ async function generate(_rootDir: string, sourceFile?: string, outJsFile?: strin
     // replace [ 'object' ].<string, type> => ({ [k: string]: type })
     pbtsResult = pbtsResult.replace(/\[ 'Array' \]\.<(\w+)>/g, '$1[]')
                            .replace(/\[ 'Array' \]\.<(\w+)\.(\w+)>/g, '$1.$2[]')
+                           .replace(/\[ 'Array' \]\.<(\w+)\.(\w+)\.(\w+)>/g, '$1.$2.$3[]')
     pbtsResult = pbtsResult.replace(/\[ 'object' \]\.<string, (\w+)>/g, '({ [k: string]: $1 })')
                            .replace(/\[ 'object' \]\.<string, (\w+)\.(\w+)>/g, '({ [k: string]: $1.$2 })')
+                           .replace(/\[ 'object' \]\.<string, (\w+)\.(\w+)\.(\w+)>/g, '({ [k: string]: $1.$2.$3 })')
     // .replace(/\(\{ \[k: (\w+)\]: (\w+).(\w+) \}\)/g, 'Map<$1, $2.$3>')
     // .replace(/\(\{ \[k: string\]: (\w+) \}\)/g, 'Map<$1, $2>');
 
