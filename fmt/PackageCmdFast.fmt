@@ -23,14 +23,14 @@ const _SCHandlerMap = {
 
 {6}const SCHandlerMap = (_SCHandlerMap) as _DeepReadonly<typeof _SCHandlerMap>;
 
-{6}function Encode<T extends keyof IMsgMap>(package_id: T, proto: IMsgMap[T]): Uint8Array|undefined {
+{6}function Encode<T extends keyof IMsgMap>(package_id: T, proto: IMsgMap[T], writer?: protobuf.Writer): Uint8Array|undefined {
     const package_handler = _SCHandlerMap[package_id];
     if (package_handler == null || (<any>package_handler).encode == null) {
         console.error(`Encode Proto failure. package type package_id:[${package_id}] not found.`);
         return undefined;
     }
     try {
-        let buffer: protobuf.Writer = (<any>package_handler).encode(proto);
+        let buffer: protobuf.Writer = (<any>package_handler).encode(proto, writer);
         return buffer.finish();
     } catch (ex) {
         console.error(`Encode package_id:${package_id} failure. error:${ex}`);
@@ -38,7 +38,7 @@ const _SCHandlerMap = {
     return undefined;
 }
 
-{6}function Decode<T extends keyof IMsgMap>(package_id: T, buffer: Uint8Array): IMsgMap[T]|undefined {
+{6}function Decode<T extends keyof IMsgMap>(package_id: T, buffer: protobuf.Reader | Uint8Array): IMsgMap[T]|undefined {
     const package_handler = _SCHandlerMap[package_id];
     if (package_handler == null) {
         console.error(`Decode Proto failure. package type package_id:[${package_id}] not found.`);

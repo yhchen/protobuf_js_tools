@@ -262,9 +262,10 @@ async function generate(_rootDir: string, sourceFile?: string, outJsFile?: strin
     } else {
         const globalProtobufLibNamespace = gCfg.defOptions.GlobalProtobufLibNamespace;
         if (globalProtobufLibNamespace) {
-            pbjsResult = pbjsResult.replace(/require\(\"protobufjs\/minimal\"\)/g, `${globalProtobufLibNamespace}.protobuf || require("protobufjs/minimal")`);
-        } else {
-            pbjsResult = pbjsResult.replace(/require\(\"protobufjs\/minimal\"\)/g, 'require("protobufjs/minimal")');
+            const importPath = !NullStr(gCfg.defOptions.importPath) ? gCfg.defOptions.importPath : 'protobufjs/minimal';
+            pbjsResult = pbjsResult.replace(/require\(\"protobufjs\/minimal\"\)/g, `${globalProtobufLibNamespace}.protobuf || require("${importPath}")`);
+        } else if (!NullStr(gCfg.defOptions.importPath)) {
+            pbjsResult = pbjsResult.replace(/require\(\"protobufjs\/minimal\"\)/g, `require("${gCfg.defOptions.importPath}")`);
         }
         // pbjsResult = `var $protobuf = require('protobufjs');\n` + pbjsResult;
     }
@@ -494,7 +495,7 @@ async function gen_packageCmdFastMode_content(protoRoot: string, protoFileList: 
     let sproto_SCHandlerMap = '';
     const sproto_protobuf_import = gCfg.defOptions.nodeMode ? 'p.' : '';
     const fmt_package = function (pname: string, comment?: string): string {
-        return `    // ${pname}: ${comment ? comment : ''}\n`;
+        return `    // ${pname}${comment ? ': ' + comment : ''}\n`;
     }
     const fmt_message = function (pname: string, mname: string, comment?: string): string {
         return `${comment ? '    ' + comment + '\n' : ''}    [EMsgType.${pname}_${mname}]: ${sproto_protobuf_import}${pname}.${mname},\n`;
